@@ -7,7 +7,7 @@ interface ParticipantProps {
   participant: LocalParticipant | RemoteParticipant;
   disableAudio?: boolean;
   enableScreenShare?: boolean;
-  onClick: () => void;
+  selectParticipant: () => void;
   isSelected: boolean;
 }
 
@@ -15,11 +15,11 @@ export default function Participant({
   participant,
   disableAudio,
   enableScreenShare,
-  onClick,
+  selectParticipant,
   isSelected,
 }: ParticipantProps) {
   return (
-    <ParticipantInfo participant={participant} onClick={onClick} isSelected={isSelected}>
+    <ParticipantInfo participant={participant} selectParticipant={selectParticipant} isSelected={isSelected}>
       <ParticipantTracks participant={participant} disableAudio={disableAudio} enableScreenShare={enableScreenShare} />
     </ParticipantInfo>
   );

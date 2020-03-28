@@ -70,11 +70,16 @@ const useStyles = makeStyles((theme: Theme) =>
 interface ParticipantInfoProps {
   participant: LocalParticipant | RemoteParticipant;
   children: React.ReactNode;
-  onClick: () => void;
+  selectParticipant: () => void;
   isSelected: boolean;
 }
 
-export default function ParticipantInfo({ participant, onClick, isSelected, children }: ParticipantInfoProps) {
+export default function ParticipantInfo({
+  participant,
+  selectParticipant,
+  isSelected,
+  children,
+}: ParticipantInfoProps) {
   const publications = usePublications(participant);
 
   const audioPublication = publications.find(p => p.kind === 'audio');
@@ -95,7 +100,6 @@ export default function ParticipantInfo({ participant, onClick, isSelected, chil
       className={clsx(classes.container, {
         [classes.isVideoSwitchedOff]: isVideoSwitchedOff,
       })}
-      onClick={onClick}
       data-cy-participant={participant.identity}
     >
       <div className={clsx(classes.infoContainer, { [classes.hideVideo]: !isVideoEnabled })}>
@@ -110,7 +114,7 @@ export default function ParticipantInfo({ participant, onClick, isSelected, chil
           {!isAudioEnabled && <MicOff data-cy-audio-mute-icon />}
           {!isVideoEnabled && <VideocamOff />}
           {isScreenShareEnabled && <ScreenShare />}
-          {isSelected && <PinIcon />}
+          {<PinIcon isPinned={isSelected} onClick={selectParticipant} />}
         </div>
       </div>
       {isVideoSwitchedOff && <BandwidthWarning />}
