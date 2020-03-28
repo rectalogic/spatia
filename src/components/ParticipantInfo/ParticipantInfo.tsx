@@ -1,13 +1,21 @@
 import React from 'react';
 import clsx from 'clsx';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { LocalParticipant, RemoteParticipant, RemoteVideoTrack, LocalVideoTrack } from 'twilio-video';
+import {
+  LocalParticipant,
+  RemoteParticipant,
+  RemoteVideoTrack,
+  LocalVideoTrack,
+  RemoteAudioTrack,
+  RemoteAudioTrackPublication,
+} from 'twilio-video';
 
 import BandwidthWarning from '../BandwidthWarning/BandwidthWarning';
 import MicOff from '@material-ui/icons/MicOff';
 import NetworkQualityLevel from '../NewtorkQualityLevel/NetworkQualityLevel';
 import ParticipantConnectionIndicator from './ParticipantConnectionIndicator/ParticipantConnectionIndicator';
 import PinIcon from './PinIcon/PinIcon';
+import SilenceIcon from './SilenceIcon/SilenceIcon';
 import ScreenShare from '@material-ui/icons/ScreenShare';
 import VideocamOff from '@material-ui/icons/VideocamOff';
 
@@ -89,10 +97,15 @@ export default function ParticipantInfo({
   const isAudioEnabled = usePublicationIsTrackEnabled(audioPublication);
   const isVideoEnabled = Boolean(videoPublication);
   const isScreenShareEnabled = publications.find(p => p.trackName === 'screen');
-
   const videoTrack = useTrack(videoPublication);
   const isVideoSwitchedOff = useIsTrackSwitchedOff(videoTrack as LocalVideoTrack | RemoteVideoTrack);
-
+  const audioTrack = useTrack(audioPublication) as RemoteAudioTrack;
+  const isSilenced = audioTrack ? !audioTrack.mediaStreamTrack.enabled : false;
+  function setSilenced(isSilenced: Boolean) {
+    if (audioTrack) {
+      audioTrack.mediaStreamTrack.enabled = !isSilenced;
+    }
+  }
   const classes = useStyles();
 
   return (
@@ -115,6 +128,7 @@ export default function ParticipantInfo({
           {!isVideoEnabled && <VideocamOff />}
           {isScreenShareEnabled && <ScreenShare />}
           {<PinIcon isPinned={isSelected} onClick={selectParticipant} />}
+          {<SilenceIcon isSilenced={isSilenced} onClick={() => setSilenced(!isSilenced)} />}
         </div>
       </div>
       {isVideoSwitchedOff && <BandwidthWarning />}
