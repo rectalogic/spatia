@@ -1,4 +1,4 @@
-import { LocalVideoTrack, RemoteVideoTrack, TwilioError } from 'twilio-video';
+import { LocalVideoTrack, RemoteVideoTrack, RemoteAudioTrack, TwilioError } from 'twilio-video';
 
 declare module 'twilio-video' {
   interface LocalParticipant {
@@ -22,6 +22,10 @@ declare module 'twilio-video' {
 
   interface RemoteVideoTrack {
     isSwitchedOff: boolean;
+    setPriority: (priority: Track.Priority | null) => void;
+  }
+
+  interface RemoteAudioTrack {
     setPriority: (priority: Track.Priority | null) => void;
   }
 

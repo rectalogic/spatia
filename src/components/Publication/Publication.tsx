@@ -1,42 +1,100 @@
 import React from 'react';
+import * as THREE from 'three';
 import useTrack from '../../hooks/useTrack/useTrack';
-import AudioTrack from '../AudioTrack/AudioTrack';
+import RemoteAudioTrack from '../AudioTrack/AudioTrack';
 import VideoTrack from '../VideoTrack/VideoTrack';
+import LocalDataTrack from '../DataTrack/LocalDataTrack';
+import RemoteDataTrack from '../DataTrack/RemoteDataTrack';
+import {
+  ParticipantLocation,
+  LocationChangeCallback,
+  RequestLocationBroadcastCallback,
+} from '../Participant/ParticipantLocation';
 
 import { IVideoTrack } from '../../types';
 import {
-  AudioTrack as IAudioTrack,
+  RemoteAudioTrack as IRemoteAudioTrack,
+  LocalDataTrack as ILocalDataTrack,
+  RemoteDataTrack as IRemoteDataTrack,
   LocalTrackPublication,
-  Participant,
-  RemoteTrackPublication,
   Track,
+  LocalParticipant,
+  RemoteVideoTrackPublication,
+  RemoteAudioTrackPublication,
+  RemoteDataTrackPublication,
 } from 'twilio-video';
+import SceneManagerCSS3D from '../../three/SceneManagerCSS3D';
 
-interface PublicationProps {
-  publication: LocalTrackPublication | RemoteTrackPublication;
-  participant: Participant;
-  isLocal: boolean;
-  disableAudio?: boolean;
-  videoPriority?: Track.Priority | null;
+interface LocalPublicationProps {
+  publication: LocalTrackPublication;
+  participant: LocalParticipant;
+  location: ParticipantLocation;
+  triggerLocationBroadcast: Track.SID;
 }
 
-export default function Publication({ publication, isLocal, disableAudio, videoPriority }: PublicationProps) {
+export function LocalPublication({ publication, location, triggerLocationBroadcast }: LocalPublicationProps) {
   const track = useTrack(publication);
 
   if (!track) return null;
 
   switch (track.kind) {
     case 'video':
+      return <VideoTrack track={track as IVideoTrack} isLocal priority="standard" />;
+    case 'audio':
+      return null;
+    case 'data':
       return (
-        <VideoTrack
-          track={track as IVideoTrack}
-          priority={videoPriority}
-          isLocal={track.name.includes('camera') && isLocal}
+        <LocalDataTrack
+          track={track as ILocalDataTrack}
+          location={location}
+          triggerLocationBroadcast={triggerLocationBroadcast}
         />
       );
-    case 'audio':
-      return disableAudio ? null : <AudioTrack track={track as IAudioTrack} />;
     default:
       return null;
   }
+}
+
+interface RemoteVideoPublicationProps {
+  publication: RemoteVideoTrackPublication;
+}
+export function RemoteVideoPublication({ publication }: RemoteVideoPublicationProps) {
+  const track = useTrack(publication);
+  if (!track) return null;
+  return <VideoTrack track={track as IVideoTrack} />;
+}
+
+interface RemoteAudioPublicationProps {
+  publication: RemoteAudioTrackPublication;
+  sceneManager: SceneManagerCSS3D;
+  participant3D: THREE.Object3D | null;
+}
+export function RemoteAudioPublication({ publication, sceneManager, participant3D }: RemoteAudioPublicationProps) {
+  const track = useTrack(publication);
+  if (!track) return null;
+  return (
+    <RemoteAudioTrack track={track as IRemoteAudioTrack} sceneManager={sceneManager} participant3D={participant3D} />
+  );
+}
+
+interface RemoteDataPublicationProps {
+  publication: RemoteDataTrackPublication;
+  onLocationChange: LocationChangeCallback;
+  requestLocationBroadcast?: RequestLocationBroadcastCallback;
+}
+export function RemoteDataPublication({
+  publication,
+  onLocationChange,
+  requestLocationBroadcast,
+}: RemoteDataPublicationProps) {
+  const track = useTrack(publication);
+
+  if (!track) return null;
+  return (
+    <RemoteDataTrack
+      track={track as IRemoteDataTrack}
+      onLocationChange={onLocationChange}
+      requestLocationBroadcast={requestLocationBroadcast}
+    />
+  );
 }

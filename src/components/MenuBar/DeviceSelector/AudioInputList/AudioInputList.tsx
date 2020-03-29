@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useAudioInputDevices } from '../deviceHooks/deviceHooks';
 import useMediaStreamTrack from '../../../../hooks/useMediaStreamTrack/useMediaStreamTrack';
 import useVideoContext from '../../../../hooks/useVideoContext/useVideoContext';
+import { LocalAudioTrack } from 'twilio-video';
 
 const useStyles = makeStyles({
   container: {
@@ -19,7 +20,7 @@ export default function AudioInputList() {
   const audioInputDevices = useAudioInputDevices();
   const { localTracks } = useVideoContext();
 
-  const localAudioTrack = localTracks.find(track => track.kind === 'audio');
+  const localAudioTrack = localTracks.find(track => track.kind === 'audio') as LocalAudioTrack;
   const mediaStreamTrack = useMediaStreamTrack(localAudioTrack);
   const localAudioInputDeviceId = mediaStreamTrack?.getSettings().deviceId;
 

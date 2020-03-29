@@ -1,25 +1,40 @@
-import { useEffect, useRef } from 'react';
-import { AudioTrack as IAudioTrack } from 'twilio-video';
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import { RemoteAudioTrack as IRemoteAudioTrack } from 'twilio-video';
 import { useAppState } from '../../state';
+import SceneManagerCSS3D from '../../three/SceneManagerCSS3D';
+import { AUDIO_REF_DISTANCE } from '../../Globals';
 
-interface AudioTrackProps {
-  track: IAudioTrack;
+interface RemoteAudioTrackProps {
+  track: IRemoteAudioTrack;
+  sceneManager: SceneManagerCSS3D;
+  participant3D: THREE.Object3D | null;
 }
 
-export default function AudioTrack({ track }: AudioTrackProps) {
+export default function RemoteAudioTrack({ track, sceneManager, participant3D }: RemoteAudioTrackProps) {
   const { activeSinkId } = useAppState();
-  const audioEl = useRef<HTMLAudioElement>();
+  const audioRef = useRef<HTMLAudioElement>(null!);
 
   useEffect(() => {
-    audioEl.current = track.attach();
-    audioEl.current.setAttribute('data-cy-audio-track-name', track.name);
-    document.body.appendChild(audioEl.current);
-    return () => track.detach().forEach(el => el.remove());
-  }, [track]);
+    if (participant3D) {
+      const audio = audioRef.current;
+      const positionalAudio = new THREE.PositionalAudio(sceneManager.listener);
+      positionalAudio.setRefDistance(AUDIO_REF_DISTANCE);
+      positionalAudio.setDirectionalCone(360, 0, 0);
+      positionalAudio.setMediaElementSource(audio);
+      participant3D.add(positionalAudio);
+      track.attach(audio);
+      return () => {
+        track.detach(audio);
+        participant3D.remove(positionalAudio);
+      };
+    }
+  }, [audioRef, track, participant3D, sceneManager]);
 
   useEffect(() => {
-    audioEl.current?.setSinkId?.(activeSinkId);
-  }, [activeSinkId]);
+    const audio = audioRef.current;
+    audio.setSinkId?.(activeSinkId);
+  }, [audioRef, activeSinkId]);
 
-  return null;
+  return <audio ref={audioRef} />;
 }

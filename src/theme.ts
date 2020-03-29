@@ -1,4 +1,5 @@
 import { createMuiTheme } from '@material-ui/core';
+import { VIDEO_WIDTH } from './Globals';
 
 declare module '@material-ui/core/styles/createMuiTheme' {
   interface Theme {
@@ -20,6 +21,6 @@ export default createMuiTheme({
       main: '#F22F46',
     },
   },
-  sidebarWidth: 260,
-  sidebarMobileHeight: 90,
+  sidebarWidth: VIDEO_WIDTH,
+  sidebarMobileHeight: VIDEO_WIDTH * (9 / 16),
 });

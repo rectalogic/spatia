@@ -4,10 +4,10 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { LocalAudioTrack, LocalVideoTrack, Participant, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
 
 import AudioLevelIndicator from '../AudioLevelIndicator/AudioLevelIndicator';
-import BandwidthWarning from '../BandwidthWarning/BandwidthWarning';
 import NetworkQualityLevel from '../NewtorkQualityLevel/NetworkQualityLevel';
 import ParticipantConnectionIndicator from './ParticipantConnectionIndicator/ParticipantConnectionIndicator';
 import VideocamOff from '@material-ui/icons/VideocamOff';
+import Videocam from '@material-ui/icons/Videocam';
 
 import useParticipantNetworkQualityLevel from '../../hooks/useParticipantNetworkQualityLevel/useParticipantNetworkQualityLevel';
 import usePublications from '../../hooks/usePublications/usePublications';
@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'relative',
       display: 'flex',
       alignItems: 'center',
+      width: `${theme.sidebarWidth}px`,
       height: `${(theme.sidebarWidth * 9) / 16}px`,
       overflow: 'hidden',
       cursor: 'pointer',
@@ -108,10 +109,9 @@ export default function ParticipantInfo({ participant, children }: ParticipantIn
         </div>
         <div>
           <AudioLevelIndicator audioTrack={audioTrack} background="white" />
-          {!isVideoEnabled && <VideocamOff />}
+          {isVideoSwitchedOff ? <VideocamOff color="error" /> : isVideoEnabled ? <Videocam /> : <VideocamOff />}
         </div>
       </div>
-      {isVideoSwitchedOff && <BandwidthWarning />}
       {children}
     </div>
   );
