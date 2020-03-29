@@ -17,7 +17,7 @@ export default function SilenceIcon({ isSilenced, onClick }: SilenceIconProps) {
       placement="top"
     >
       <SvgIcon onClick={onClick} style={{ float: 'right', fontSize: '29px' }}>
-        {isSilenced ? <Unmute /> : <Mute />}
+        {isSilenced ? <Mute /> : <Unmute />}
       </SvgIcon>
     </Tooltip>
   );

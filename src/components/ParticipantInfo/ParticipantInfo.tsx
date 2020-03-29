@@ -24,6 +24,7 @@ import usePublications from '../../hooks/usePublications/usePublications';
 import useIsTrackSwitchedOff from '../../hooks/useIsTrackSwitchedOff/useIsTrackSwitchedOff';
 import usePublicationIsTrackEnabled from '../../hooks/usePublicationIsTrackEnabled/usePublicationIsTrackEnabled';
 import useTrack from '../../hooks/useTrack/useTrack';
+import useRemoteAudioToggle from '../../hooks/useRemoteAudioToggle/useRemoteAudioToggle';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,12 +101,7 @@ export default function ParticipantInfo({
   const videoTrack = useTrack(videoPublication);
   const isVideoSwitchedOff = useIsTrackSwitchedOff(videoTrack as LocalVideoTrack | RemoteVideoTrack);
   const audioTrack = useTrack(audioPublication) as RemoteAudioTrack;
-  const isSilenced = audioTrack ? !audioTrack.mediaStreamTrack.enabled : false;
-  function setSilenced(isSilenced: Boolean) {
-    if (audioTrack) {
-      audioTrack.mediaStreamTrack.enabled = !isSilenced;
-    }
-  }
+  const [isRemoteAudioEnabled, toggleRemoteAudioEnabled] = useRemoteAudioToggle(audioTrack);
   const classes = useStyles();
 
   return (
@@ -128,7 +124,7 @@ export default function ParticipantInfo({
           {!isVideoEnabled && <VideocamOff />}
           {isScreenShareEnabled && <ScreenShare />}
           {<PinIcon isPinned={isSelected} onClick={selectParticipant} />}
-          {<SilenceIcon isSilenced={isSilenced} onClick={() => setSilenced(!isSilenced)} />}
+          {<SilenceIcon isSilenced={!isRemoteAudioEnabled} onClick={toggleRemoteAudioEnabled} />}
         </div>
       </div>
       {isVideoSwitchedOff && <BandwidthWarning />}
