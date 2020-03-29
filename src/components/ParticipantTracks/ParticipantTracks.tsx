@@ -7,7 +7,6 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 interface ParticipantTracksProps {
   participant: Participant;
   disableAudio?: boolean;
-  enableScreenShare?: boolean;
   videoPriority?: Track.Priority | null;
 }
 
@@ -19,27 +18,14 @@ interface ParticipantTracksProps {
  *  and the Publication component renders Tracks.
  */
 
-export default function ParticipantTracks({
-  participant,
-  disableAudio,
-  enableScreenShare,
-  videoPriority,
-}: ParticipantTracksProps) {
+export default function ParticipantTracks({ participant, disableAudio, videoPriority }: ParticipantTracksProps) {
   const { room } = useVideoContext();
   const publications = usePublications(participant);
   const isLocal = participant === room.localParticipant;
 
-  let filteredPublications;
-
-  if (enableScreenShare && publications.some(p => p.trackName.includes('screen'))) {
-    filteredPublications = publications.filter(p => !p.trackName.includes('camera'));
-  } else {
-    filteredPublications = publications.filter(p => !p.trackName.includes('screen'));
-  }
-
   return (
     <>
-      {filteredPublications.map(publication => (
+      {publications.map(publication => (
         <Publication
           key={publication.kind}
           publication={publication}

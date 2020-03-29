@@ -21,26 +21,23 @@ describe('the Controls component', () => {
       expect(wrapper.find('div').prop('className')).toContain('showControls');
     });
 
-    it('should not render the ToggleScreenShare and EndCall buttons when not connected to a room', () => {
+    it('should not render the EndCall buttons when not connected to a room', () => {
       mockUseRoomState.mockImplementation(() => 'disconnected');
       const wrapper = shallow(<Controls />);
-      expect(wrapper.find('ToggleScreenShareButton').exists()).toBe(false);
       expect(wrapper.find('EndCallButton').exists()).toBe(false);
     });
 
-    it('should render the ToggleScreenShare and EndCall buttons when connected to a room', () => {
+    it('should render the EndCall buttons when connected to a room', () => {
       mockUseRoomState.mockImplementation(() => 'connected');
       const wrapper = shallow(<Controls />);
-      expect(wrapper.find('ToggleScreenShareButton').exists()).toBe(true);
       expect(wrapper.find('EndCallButton').exists()).toBe(true);
     });
 
-    it('should disable the ToggleAudio, ToggleVideo, and ToggleScreenShare buttons when reconnecting to a room', () => {
+    it('should disable the ToggleAudio, ToggleVideo buttons when reconnecting to a room', () => {
       mockUseRoomState.mockImplementation(() => 'reconnecting');
       const wrapper = shallow(<Controls />);
       expect(wrapper.find('ToggleAudioButton').prop('disabled')).toBe(true);
       expect(wrapper.find('ToggleVideoButton').prop('disabled')).toBe(true);
-      expect(wrapper.find('ToggleScreenShareButton').prop('disabled')).toBe(true);
     });
   });
 

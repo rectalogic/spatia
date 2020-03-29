@@ -43,9 +43,7 @@ export default function useRoom(localTracks: LocalTrack[], onError: Callback, op
           localTracksRef.current.forEach(track =>
             // Tracks can be supplied as arguments to the Video.connect() function and they will automatically be published.
             // However, tracks must be published manually in order to set the priority on them.
-            // All video tracks are published with 'low' priority. This works because the video
-            // track that is displayed in the 'MainParticipant' component will have it's priority
-            // set to 'high' via track.setPriority()
+            // All video tracks are published with 'low' priority.
             newRoom.localParticipant.publishTrack(track, { priority: track.kind === 'video' ? 'low' : 'standard' })
           );
 

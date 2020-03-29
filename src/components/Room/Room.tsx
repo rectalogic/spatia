@@ -1,7 +1,6 @@
 import React from 'react';
 import ParticipantStrip from '../ParticipantStrip/ParticipantStrip';
 import { styled } from '@material-ui/core/styles';
-import MainParticipant from '../MainParticipant/MainParticipant';
 
 const Container = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -22,7 +21,6 @@ export default function Room() {
   return (
     <Container>
       <ParticipantStrip />
-      <MainParticipant />
     </Container>
   );
 }

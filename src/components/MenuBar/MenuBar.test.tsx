@@ -2,7 +2,6 @@ import React from 'react';
 import MenuBar from './MenuBar';
 import { MemoryRouter, Route } from 'react-router-dom';
 import useRoomState from '../../hooks/useRoomState/useRoomState';
-import useFullScreenToggle from '../../hooks/useFullScreenToggle/useFullScreenToggle';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { IVideoContext } from '../VideoProvider';
 import { fireEvent, render } from '@testing-library/react';
@@ -10,16 +9,13 @@ import '@testing-library/jest-dom/extend-expect';
 import { useAppState } from '../../state';
 
 const mockedUseRoomState = useRoomState as jest.Mock<string>;
-const mockeduseFullScreenToggle = useFullScreenToggle as jest.Mock;
 const mockedUseVideoContext = useVideoContext as jest.Mock<IVideoContext>;
 const mockUseAppState = useAppState as jest.Mock<any>;
-const mockToggleFullScreen = jest.fn();
 const mockConnect = jest.fn();
 const mockGetToken = jest.fn(() => Promise.resolve('mockToken'));
 
 jest.mock('../../hooks/useVideoContext/useVideoContext');
 jest.mock('../../hooks/useRoomState/useRoomState');
-jest.mock('../../hooks/useFullScreenToggle/useFullScreenToggle');
 jest.mock('../../state');
 
 delete window.location;
@@ -46,7 +42,6 @@ Object.defineProperty(window.history, 'replaceState', { value: mockReplaceState 
 
 describe('the MenuBar component', () => {
   beforeEach(jest.clearAllMocks);
-  mockeduseFullScreenToggle.mockImplementation(() => [true, mockToggleFullScreen]);
   mockUseAppState.mockImplementation(() => ({ getToken: mockGetToken }));
 
   it('should hide inputs when connected to a room', () => {
