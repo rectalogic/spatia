@@ -26,7 +26,6 @@ const connectionOptions: ConnectOptions = {
   bandwidthProfile: {
     video: {
       mode: 'collaboration',
-      dominantSpeakerPriority: 'standard',
       renderDimensions: {
         high: { height: 1080, width: 1920 },
         standard: { height: 720, width: 1280 },
@@ -34,7 +33,7 @@ const connectionOptions: ConnectOptions = {
       },
     },
   },
-  dominantSpeaker: true,
+  dominantSpeaker: false,
   networkQuality: { local: 1, remote: 1 },
 
   // Comment this line if you are playing music.
