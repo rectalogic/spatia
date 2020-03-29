@@ -8,7 +8,6 @@ import {
   TwilioError,
 } from 'twilio-video';
 import { Callback, ErrorCallback } from '../../types';
-import { SelectedParticipantProvider } from './useSelectedParticipant/useSelectedParticipant';
 
 import useHandleRoomDisconnectionErrors from './useHandleRoomDisconnectionErrors/useHandleRoomDisconnectionErrors';
 import useHandleOnDisconnect from './useHandleOnDisconnect/useHandleOnDisconnect';
@@ -68,7 +67,7 @@ export function VideoProvider({ options, children, onError = () => {}, onDisconn
         connect,
       }}
     >
-      <SelectedParticipantProvider room={room}>{children}</SelectedParticipantProvider>
+      {children}
     </VideoContext.Provider>
   );
 }

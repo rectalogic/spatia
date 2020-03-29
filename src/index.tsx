@@ -21,7 +21,6 @@ const connectionOptions: ConnectOptions = {
   bandwidthProfile: {
     video: {
       mode: 'collaboration',
-      dominantSpeakerPriority: 'standard',
       renderDimensions: {
         high: { height: 1080, width: 1920 },
         standard: { height: 720, width: 1280 },
@@ -29,7 +28,7 @@ const connectionOptions: ConnectOptions = {
       },
     },
   },
-  dominantSpeaker: true,
+  dominantSpeaker: false,
   maxAudioBitrate: 12000,
   networkQuality: { local: 1, remote: 1 },
   preferredVideoCodecs: [{ codec: 'VP8', simulcast: true }],

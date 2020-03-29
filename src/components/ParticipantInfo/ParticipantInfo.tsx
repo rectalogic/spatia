@@ -7,8 +7,6 @@ import AudioLevelIndicator from '../AudioLevelIndicator/AudioLevelIndicator';
 import BandwidthWarning from '../BandwidthWarning/BandwidthWarning';
 import NetworkQualityLevel from '../NewtorkQualityLevel/NetworkQualityLevel';
 import ParticipantConnectionIndicator from './ParticipantConnectionIndicator/ParticipantConnectionIndicator';
-import PinIcon from './PinIcon/PinIcon';
-import ScreenShare from '@material-ui/icons/ScreenShare';
 import VideocamOff from '@material-ui/icons/VideocamOff';
 
 import useParticipantNetworkQualityLevel from '../../hooks/useParticipantNetworkQualityLevel/useParticipantNetworkQualityLevel';
@@ -75,11 +73,9 @@ const useStyles = makeStyles((theme: Theme) =>
 interface ParticipantInfoProps {
   participant: Participant;
   children: React.ReactNode;
-  onClick: () => void;
-  isSelected: boolean;
 }
 
-export default function ParticipantInfo({ participant, onClick, isSelected, children }: ParticipantInfoProps) {
+export default function ParticipantInfo({ participant, children }: ParticipantInfoProps) {
   const publications = usePublications(participant);
 
   const audioPublication = publications.find(p => p.kind === 'audio');
@@ -87,7 +83,6 @@ export default function ParticipantInfo({ participant, onClick, isSelected, chil
 
   const networkQualityLevel = useParticipantNetworkQualityLevel(participant);
   const isVideoEnabled = Boolean(videoPublication);
-  const isScreenShareEnabled = publications.find(p => p.trackName === 'screen');
 
   const videoTrack = useTrack(videoPublication);
   const isVideoSwitchedOff = useIsTrackSwitchedOff(videoTrack as LocalVideoTrack | RemoteVideoTrack);
@@ -101,7 +96,6 @@ export default function ParticipantInfo({ participant, onClick, isSelected, chil
       className={clsx(classes.container, {
         [classes.isVideoSwitchedOff]: isVideoSwitchedOff,
       })}
-      onClick={onClick}
       data-cy-participant={participant.identity}
     >
       <div className={clsx(classes.infoContainer, { [classes.hideVideo]: !isVideoEnabled })}>
@@ -115,8 +109,6 @@ export default function ParticipantInfo({ participant, onClick, isSelected, chil
         <div>
           <AudioLevelIndicator audioTrack={audioTrack} background="white" />
           {!isVideoEnabled && <VideocamOff />}
-          {isScreenShareEnabled && <ScreenShare />}
-          {isSelected && <PinIcon />}
         </div>
       </div>
       {isVideoSwitchedOff && <BandwidthWarning />}

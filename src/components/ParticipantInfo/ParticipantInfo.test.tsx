@@ -1,6 +1,5 @@
 import React from 'react';
 import ParticipantInfo from './ParticipantInfo';
-import PinIcon from './PinIcon/PinIcon';
 import { shallow } from 'enzyme';
 import usePublications from '../../hooks/usePublications/usePublications';
 import useIsTrackSwitchedOff from '../../hooks/useIsTrackSwitchedOff/useIsTrackSwitchedOff';
@@ -13,32 +12,34 @@ const mockUsePublications = usePublications as jest.Mock<any>;
 const mockUseIsTrackSwitchedOff = useIsTrackSwitchedOff as jest.Mock<any>;
 
 describe('the ParticipantInfo component', () => {
-  it('should display ScreenShare icon when participant has published a screen share track', () => {
-    mockUsePublications.mockImplementation(() => [{ trackName: 'screen' }]);
-    const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
-    );
-    expect(wrapper.find('ScreenShareIcon').exists()).toEqual(true);
-  });
-
-  it('should not display ScreenShare icon when participant has not published a screen share track', () => {
+  it('should display MicOff icon when no audio tracks are published', () => {
     mockUsePublications.mockImplementation(() => []);
     const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
     );
-    expect(wrapper.find('ScreenShareIcon').exists()).toEqual(false);
+    expect(wrapper.find('MicOffIcon').exists()).toEqual(true);
+  });
+
+  it('should not display MicOff icon when an audio track is published', () => {
+    mockUsePublications.mockImplementation(() => [{ kind: 'audio', isTrackEnabled: true }]);
+    const wrapper = shallow(
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
+    );
+    expect(wrapper.find('MicOffIcon').exists()).toEqual(false);
+  });
+
+  it('should not display MicOff icon when an audio track is published and not enabled', () => {
+    mockUsePublications.mockImplementation(() => [{ kind: 'audio', isTrackEnabled: false }]);
+    const wrapper = shallow(
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
+    );
+    expect(wrapper.find('MicOffIcon').exists()).toEqual(true);
   });
 
   it('should add hideVideoProp to InfoContainer component when no video tracks are published', () => {
     mockUsePublications.mockImplementation(() => []);
     const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
     );
     expect(wrapper.find('.makeStyles-infoContainer-3').prop('className')).toContain('hideVideo');
   });
@@ -46,9 +47,7 @@ describe('the ParticipantInfo component', () => {
   it('should not add hideVideoProp to InfoContainer component when a video track is published', () => {
     mockUsePublications.mockImplementation(() => [{ trackName: 'camera' }]);
     const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
     );
     expect(wrapper.find('.makeStyles-infoContainer-3').prop('className')).not.toContain('hideVideo');
   });
@@ -56,9 +55,7 @@ describe('the ParticipantInfo component', () => {
   it('should render a VideoCamOff icon when no video tracks are published', () => {
     mockUsePublications.mockImplementation(() => []);
     const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
     );
     expect(wrapper.find('VideocamOffIcon').exists()).toEqual(true);
   });
@@ -66,9 +63,7 @@ describe('the ParticipantInfo component', () => {
   it('should not render a VideoCamOff icon when a video track is published', () => {
     mockUsePublications.mockImplementation(() => [{ trackName: 'camera' }]);
     const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
     );
     expect(wrapper.find('VideocamOffIcon').exists()).toEqual(false);
   });
@@ -77,9 +72,7 @@ describe('the ParticipantInfo component', () => {
     mockUseIsTrackSwitchedOff.mockImplementation(() => true);
     mockUsePublications.mockImplementation(() => [{ trackName: 'camera' }]);
     const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
     );
     expect(wrapper.find('.makeStyles-container-1').prop('className')).toContain('isVideoSwitchedOff');
   });
@@ -88,30 +81,8 @@ describe('the ParticipantInfo component', () => {
     mockUseIsTrackSwitchedOff.mockImplementation(() => false);
     mockUsePublications.mockImplementation(() => [{ trackName: 'camera' }]);
     const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
+      <ParticipantInfo participant={{ identity: 'mockIdentity' } as any}>mock children</ParticipantInfo>
     );
     expect(wrapper.find('.makeStyles-container-1').prop('className')).not.toContain('isVideoSwitchedOff');
-  });
-
-  it('should render the PinIcon component when the participant is selected', () => {
-    mockUsePublications.mockImplementation(() => [{ trackName: 'camera' }]);
-    const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={true} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
-    );
-    expect(wrapper.exists(PinIcon)).toBe(true);
-  });
-
-  it('should not render the PinIcon component when the participant is not selected', () => {
-    mockUsePublications.mockImplementation(() => [{ trackName: 'camera' }]);
-    const wrapper = shallow(
-      <ParticipantInfo onClick={() => {}} isSelected={false} participant={{ identity: 'mockIdentity' } as any}>
-        mock children
-      </ParticipantInfo>
-    );
-    expect(wrapper.exists(PinIcon)).toBe(false);
   });
 });
