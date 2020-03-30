@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-
 import { ensureMediaPermissions } from '../../../utils';
-import Video, { LocalVideoTrack, LocalAudioTrack, CreateLocalTrackOptions } from 'twilio-video';
+import Video, { LocalVideoTrack, LocalAudioTrack, LocalDataTrack, CreateLocalTrackOptions } from 'twilio-video';
 
 export function useLocalAudioTrack() {
   const [track, setTrack] = useState<LocalAudioTrack>();
@@ -81,13 +80,25 @@ export function useLocalVideoTrack() {
   return [track, getLocalVideoTrack] as const;
 }
 
+export function useLocalDataTrack() {
+  const [track, setTrack] = useState<LocalDataTrack>();
+
+  useEffect(() => {
+    setTrack(new Video.LocalDataTrack());
+  }, []);
+
+  return track;
+}
+
 export default function useLocalTracks() {
   const [audioTrack, getLocalAudioTrack] = useLocalAudioTrack();
   const [videoTrack, getLocalVideoTrack] = useLocalVideoTrack();
+  const dataTrack = useLocalDataTrack();
 
-  const localTracks = [audioTrack, videoTrack].filter(track => track !== undefined) as (
+  const localTracks = [audioTrack, videoTrack, dataTrack].filter(track => track !== undefined) as (
     | LocalAudioTrack
     | LocalVideoTrack
+    | LocalDataTrack
   )[];
 
   return { localTracks, getLocalVideoTrack, getLocalAudioTrack };

@@ -3,6 +3,7 @@ import {
   CreateLocalTrackOptions,
   ConnectOptions,
   LocalAudioTrack,
+  LocalDataTrack,
   LocalVideoTrack,
   Room,
   TwilioError,
@@ -25,7 +26,7 @@ import useRoom from './useRoom/useRoom';
 
 export interface IVideoContext {
   room: Room;
-  localTracks: (LocalAudioTrack | LocalVideoTrack)[];
+  localTracks: (LocalAudioTrack | LocalVideoTrack | LocalDataTrack)[];
   isConnecting: boolean;
   connect: (token: string) => Promise<void>;
   onError: ErrorCallback;

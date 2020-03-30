@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { LocalTrack, LocalVideoTrack, LocalAudioTrack } from 'twilio-video';
 import AboutDialog from '../AboutDialog/AboutDialog';
 import IconButton from '@material-ui/core/IconButton';
 import MenuContainer from '@material-ui/core/Menu';
@@ -20,7 +21,10 @@ export default function Menu() {
 
   const handleSignOut = useCallback(() => {
     room.disconnect?.();
-    localTracks.forEach(track => track.stop());
+    let isLocalMedia = (track: LocalTrack): track is LocalAudioTrack | LocalVideoTrack => {
+      return track.kind !== 'data';
+    };
+    localTracks.filter(isLocalMedia).forEach(track => track.stop());
     signOut?.();
   }, [room.disconnect, localTracks, signOut]);
 

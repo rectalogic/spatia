@@ -1,14 +1,14 @@
 import React from 'react';
-import { Participant, Track } from 'twilio-video';
-import Publication from '../Publication/Publication';
+import {
+  LocalParticipant,
+  RemoteParticipant,
+  Track,
+  LocalTrackPublication,
+  RemoteTrackPublication,
+} from 'twilio-video';
+import { LocalPublication, RemotePublication } from '../Publication/Publication';
 import usePublications from '../../hooks/usePublications/usePublications';
-import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-
-interface ParticipantTracksProps {
-  participant: Participant;
-  disableAudio?: boolean;
-  videoPriority?: Track.Priority | null;
-}
+import { LocationCallback, ParticipantLocation, RequestLocationCallback } from '../Participant/ParticipantLocation';
 
 /*
  *  The object model for the Room object (found here: https://www.twilio.com/docs/video/migrating-1x-2x#object-model) shows
@@ -18,21 +18,57 @@ interface ParticipantTracksProps {
  *  and the Publication component renders Tracks.
  */
 
-export default function ParticipantTracks({ participant, disableAudio, videoPriority }: ParticipantTracksProps) {
-  const { room } = useVideoContext();
+interface LocalParticipantTracksProps {
+  participant: LocalParticipant;
+  location: ParticipantLocation;
+  locationRequested: Track.SID;
+}
+
+export function LocalParticipantTracks({ participant, location, locationRequested }: LocalParticipantTracksProps) {
   const publications = usePublications(participant);
-  const isLocal = participant === room.localParticipant;
+  return (
+    <>
+      {publications.map(publication => (
+        <LocalPublication
+          key={publication.kind}
+          publication={publication as LocalTrackPublication}
+          participant={participant}
+          location={location}
+          locationRequested={locationRequested}
+        />
+      ))}
+    </>
+  );
+}
+
+interface RemoteParticipantTracksProps {
+  participant: RemoteParticipant;
+  videoPriority: Track.Priority | null;
+  audioPriority: Track.Priority | null;
+  onLocationChange: LocationCallback;
+  requestLocation: RequestLocationCallback;
+}
+
+export function RemoteParticipantTracks({
+  participant,
+  videoPriority,
+  audioPriority,
+  onLocationChange,
+  requestLocation,
+}: RemoteParticipantTracksProps) {
+  const publications = usePublications(participant);
 
   return (
     <>
       {publications.map(publication => (
-        <Publication
+        <RemotePublication
           key={publication.kind}
-          publication={publication}
+          publication={publication as RemoteTrackPublication}
           participant={participant}
-          isLocal={isLocal}
-          disableAudio={disableAudio}
           videoPriority={videoPriority}
+          audioPriority={audioPriority}
+          onLocationChange={onLocationChange}
+          requestLocation={requestLocation}
         />
       ))}
     </>
