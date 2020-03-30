@@ -44,20 +44,6 @@ describe('the Publication component', () => {
       expect(useTrack).toHaveBeenCalledWith('mockPublication');
       expect(wrapper.find('AudioTrack').length).toBe(1);
     });
-
-    it('should render null when disableAudio is true', () => {
-      mockUseTrack.mockImplementation(() => ({ kind: 'audio' }));
-      const wrapper = shallow(
-        <Publication
-          isLocal
-          publication={'mockPublication' as any}
-          participant={'mockParticipant' as any}
-          disableAudio={true}
-        />
-      );
-      expect(useTrack).toHaveBeenCalledWith('mockPublication');
-      expect(wrapper.find('AudioTrack').length).toBe(0);
-    });
   });
 
   it('should render null when there is no track', () => {

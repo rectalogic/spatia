@@ -15,6 +15,7 @@ import useRoomState from '../../hooks/useRoomState/useRoomState';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { Typography } from '@material-ui/core';
 import FlipCameraButton from './FlipCameraButton/FlipCameraButton';
+import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -62,7 +63,11 @@ export default function MenuBar() {
   const classes = useStyles();
   const { URLRoomName } = useParams();
   const { user, getToken, isFetching } = useAppState();
-  const { isConnecting, connect } = useVideoContext();
+  const {
+    isConnecting,
+    connect,
+    room: { localParticipant },
+  } = useVideoContext();
   const roomState = useRoomState();
 
   const [name, setName] = useState<string>(user?.displayName || '');
@@ -133,6 +138,7 @@ export default function MenuBar() {
           <h3>{roomName}</h3>
         )}
         <div className={classes.rightButtonContainer}>
+          {roomState === 'disconnected' || <ParticipantInfo participant={localParticipant} isLocal />}
           <LocalAudioLevelIndicator />
           <FlipCameraButton />
           <Menu />
