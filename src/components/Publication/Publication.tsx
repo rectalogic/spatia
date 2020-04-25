@@ -1,6 +1,6 @@
 import React from 'react';
 import useTrack from '../../hooks/useTrack/useTrack';
-import { LocalAudioTrack, RemoteAudioTrack3D } from '../AudioTrack/AudioTrack';
+import RemoteAudioTrack3D from '../AudioTrack/AudioTrack';
 import VideoTrack3D from '../VideoTrack/VideoTrack';
 import LocalDataTrack from '../DataTrack/LocalDataTrack';
 import RemoteDataTrack from '../DataTrack/RemoteDataTrack';
@@ -9,7 +9,6 @@ import { ParticipantLocation, LocationCallback, RequestLocationCallback } from '
 import { IVideoTrack } from '../../types';
 import {
   RemoteAudioTrack as IRemoteAudioTrack,
-  LocalAudioTrack as ILocalAudioTrack,
   LocalDataTrack as ILocalDataTrack,
   RemoteDataTrack as IRemoteDataTrack,
   LocalTrackPublication,
@@ -40,7 +39,7 @@ export function LocalPublication({ publication, location, locationRequested }: L
         </group>
       );
     case 'audio':
-      return <LocalAudioTrack track={track as ILocalAudioTrack} />;
+      return null;
     case 'data':
       return (
         <LocalDataTrack track={track as ILocalDataTrack} location={location} locationRequested={locationRequested} />
