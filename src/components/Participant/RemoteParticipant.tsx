@@ -3,7 +3,6 @@ import { RemoteParticipantTracks } from '../ParticipantTracks/ParticipantTracks'
 import { RemoteParticipant as IRemoteParticipant, Track } from 'twilio-video';
 import { ParticipantLocation, RequestLocationCallback } from './ParticipantLocation';
 import { ReactThreeFiber, PointerEvent, useFrame } from 'react-three-fiber';
-import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
 import Dom3D from '../Dom3D/Dom3D';
 import * as THREE from 'three';
 import { VIDEO_MAX_DISTANCE, AUDIO_MAX_DISTANCE } from '../../Globals';
@@ -31,10 +30,11 @@ function Direction({ color, position, scale }: DirectionProps) {
 
 export interface RemoteParticipantProps {
   participant: IRemoteParticipant;
+  infoElement: HTMLElement | null;
   requestLocation: RequestLocationCallback;
 }
 
-export default function RemoteParticipant({ participant, requestLocation }: RemoteParticipantProps) {
+export default function RemoteParticipant({ participant, infoElement, requestLocation }: RemoteParticipantProps) {
   const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
   const [videoPriority, setVideoPriority] = useState<Track.Priority | null>('standard');
   const [audioPriority, setAudioPriority] = useState<Track.Priority | null>('standard');
@@ -77,11 +77,11 @@ export default function RemoteParticipant({ participant, requestLocation }: Remo
 
     setVideoPriority(newVideoPriority);
     setAudioPriority(newAudioPriority);
-    const min = 2;
+    const min = 5;
     if (distance <= min) {
       setInfoScale(1);
     } else {
-      setInfoScale(THREE.MathUtils.clamp(1 - distance / (VIDEO_MAX_DISTANCE - min), 0.5, 1));
+      setInfoScale(THREE.MathUtils.clamp((1 - distance - min) / VIDEO_MAX_DISTANCE, 0.5, 1));
     }
   });
 
@@ -104,9 +104,7 @@ export default function RemoteParticipant({ participant, requestLocation }: Remo
   return (
     <group position={[participantLocation.x, 1, participantLocation.z]} rotation-y={participantLocation.ry}>
       <group scale={[2, 2, 1]} onPointerOver={onPointerOver} onPointerOut={onPointerOut}>
-        <Dom3D scale={infoScale} position={[0, 0.5, 0]}>
-          <ParticipantInfo participant={participant} />
-        </Dom3D>
+        <Dom3D element={infoElement} scale={infoScale} position={[0, 0.5, 0]} />
         <RemoteParticipantTracks
           participant={participant}
           videoPriority={videoPriority}

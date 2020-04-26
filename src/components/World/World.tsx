@@ -80,7 +80,7 @@ export default function World({ children }: WorldProps) {
       <directionalLight args={[0xffffff, 1]} position={[0, 1, -2]} />
       {children}
       {PORTALS.map(({ position, color }) => (
-        <Portal position={position} color={color} envMap={cubeTexture} />
+        <Portal key={position.toString()} position={position} color={color} envMap={cubeTexture} />
       ))}
       <Ground envMap={cubeTexture} />
     </>
