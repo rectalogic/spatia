@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useThree, ReactThreeFiber } from 'react-three-fiber';
 import * as THREE from 'three';
-import { WORLD_SIZE, PORTAL_RADIUS } from '../../Globals';
+import { WORLD_SIZE, PORTAL_RADIUS, PORTALS } from '../../Globals';
 import pxCube from './Textures/SkyBox/px.png';
 import nxCube from './Textures/SkyBox/nx.png';
 import pyCube from './Textures/SkyBox/py.png';
@@ -79,11 +79,9 @@ export default function World({ children }: WorldProps) {
       <ambientLight args={[0xffad5e, 0.3]} />
       <directionalLight args={[0xffffff, 1]} position={[0, 1, -2]} />
       {children}
-      <Portal position={[0, 0, 0]} color={0x555555} envMap={cubeTexture} />
-      <Portal position={[-10, 0, 0]} color={0xaa0000} envMap={cubeTexture} />
-      <Portal position={[10, 0, 0]} color={0x00aa00} envMap={cubeTexture} />
-      <Portal position={[0, 0, -10]} color={0x0000aa} envMap={cubeTexture} />
-      <Portal position={[0, 0, 10]} color={0xaaaa00} envMap={cubeTexture} />
+      {PORTALS.map(({ position, color }) => (
+        <Portal position={position} color={color} envMap={cubeTexture} />
+      ))}
       <Ground envMap={cubeTexture} />
     </>
   );

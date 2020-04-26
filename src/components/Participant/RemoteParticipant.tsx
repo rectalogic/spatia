@@ -115,7 +115,7 @@ export default function RemoteParticipant({ participant, requestLocation }: Remo
           requestLocation={requestLocation}
         />
       </group>
-      <Direction position={[0, -0.5, 0]} scale={[0.5, 0.5, 0.5]} color={0x555555} />
+      <Direction position={[0, -0.5, 0]} scale={[0.5, 0.5, 0.5]} color={0xaa0000} />
     </group>
   );
 }

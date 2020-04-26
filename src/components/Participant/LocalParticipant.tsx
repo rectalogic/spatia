@@ -3,8 +3,8 @@ import { LocalParticipant as ILocalParticipant, Track } from 'twilio-video';
 import { useThree, useFrame } from 'react-three-fiber';
 import * as THREE from 'three';
 import { LocalParticipantTracks } from '../ParticipantTracks/ParticipantTracks';
-import { ParticipantLocation } from '../Participant/ParticipantLocation';
-import { WORLD_SIZE, PORTAL_RADIUS, CAMERA_FOV } from '../../Globals';
+import { ParticipantLocation, positionAroundPortal } from '../Participant/ParticipantLocation';
+import { WORLD_SIZE, CAMERA_FOV, PORTALS } from '../../Globals';
 
 const MAXPOS = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
 const MINPOS = new THREE.Vector3(-WORLD_SIZE / 2, 0, -WORLD_SIZE / 2);
@@ -62,10 +62,7 @@ export interface LocalParticipantProps {
 export default function LocalParticipant({ participant, controlling, locationRequested }: LocalParticipantProps) {
   // Randomly position ourself around the portal perimeter
   const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>(() => {
-    const angle = 2 * Math.PI * Math.random();
-    const x = 2.5 * PORTAL_RADIUS * Math.cos(angle);
-    const z = 2.5 * PORTAL_RADIUS * Math.sin(angle);
-    return { x: x, z: z, ry: Math.PI / 2 - angle };
+    return positionAroundPortal(PORTALS[0]['position']);
   });
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
   const participantRef = useRef<THREE.Object3D>(null);
