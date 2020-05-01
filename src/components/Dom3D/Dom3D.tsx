@@ -2,13 +2,20 @@ import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { useThree, useFrame, ReactThreeFiber } from 'react-three-fiber';
 
-interface Dom3DProps {
-  element: HTMLElement | null;
-  position: ReactThreeFiber.Vector3;
+export interface Dom3DElementProps {
+  opacity: number;
+  x: number;
+  y: number;
   scale: number;
 }
 
-export default function Dom3D({ element, position, scale }: Dom3DProps) {
+interface Dom3DProps {
+  position: ReactThreeFiber.Vector3;
+  scale: number;
+  setElementProps: (props: Dom3DElementProps) => void;
+}
+
+export default function Dom3D({ position, scale, setElementProps }: Dom3DProps) {
   const { camera, size } = useThree();
   const group = useRef<THREE.Object3D>();
   const vector = new THREE.Vector3();
@@ -16,7 +23,7 @@ export default function Dom3D({ element, position, scale }: Dom3DProps) {
   const oldVector = useRef(new THREE.Vector3(1, 1, 0));
   const epsilon = 0.001;
 
-  function updatePosition(group: THREE.Object3D, element: HTMLElement, epsilon: number) {
+  function updatePosition(group: THREE.Object3D, epsilon: number) {
     vector.setFromMatrixPosition(group.matrixWorld);
 
     // See Vector3.project() but we need to keep Vector4.w
@@ -41,19 +48,18 @@ export default function Dom3D({ element, position, scale }: Dom3DProps) {
       vector.x = THREE.MathUtils.clamp(vector.x, 0, size.width);
       vector.y = THREE.MathUtils.clamp(vector.y, 0, size.height);
       // Dim if offscreen
+      let opacity = 1;
       if (vector.x <= 0 || vector.x >= size.width || vector.y <= 0 || vector.y >= size.height) {
-        element.style.opacity = '0.3';
-      } else {
-        element.style.opacity = '1';
+        opacity = 0.3;
       }
-      element.style.transform = 'translate3d(' + vector.x + 'px,' + vector.y + 'px,0) scale(' + scale + ')';
+      setElementProps({ x: vector.x, y: vector.y, scale: scale, opacity: opacity });
     }
     oldVector.current.copy(vector);
   }
 
   useFrame(() => {
-    if (group.current && element) {
-      updatePosition(group.current, element, epsilon);
+    if (group.current) {
+      updatePosition(group.current, epsilon);
     }
   });
 

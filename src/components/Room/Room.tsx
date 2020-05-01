@@ -9,6 +9,7 @@ import { VideoContext } from '../../components/VideoProvider';
 import World from '../World/World';
 import { Track, Participant } from 'twilio-video';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
+import { Dom3DElementProps } from '../Dom3D/Dom3D';
 
 const CanvasContainer = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -24,7 +25,7 @@ export default function Room() {
   const participants = useParticipants();
   const [controlling, setControlling] = useState(false);
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
-  const [infoElements, setInfoElements] = useState<Map<Participant.SID, HTMLElement>>(new Map());
+  const [infoElementProps, setInfoElementProps] = useState<Map<Participant.SID, Dom3DElementProps>>(new Map());
 
   function onStartController(e: PointerEvent) {
     e.stopPropagation();
@@ -35,14 +36,21 @@ export default function Room() {
     setControlling(false);
   }
 
-  // https://github.com/facebook/react/issues/1899
-  function updateInfoElements(sid: Participant.SID, e: HTMLElement | null) {
-    if (e) {
-      infoElements.set(sid, e);
+  function updateInfoElementProps(sid: Participant.SID, elementProps: Dom3DElementProps | null) {
+    // Need to clone map so change recognized https://medium.com/swlh/using-es6-map-with-react-state-hooks-800b91eedd5f
+    if (elementProps == null) {
+      if (infoElementProps.delete(sid)) {
+        setInfoElementProps(new Map(infoElementProps));
+      }
     } else {
-      infoElements.delete(sid);
+      setInfoElementProps(new Map(infoElementProps.set(sid, elementProps)));
     }
-    setInfoElements(infoElements);
+  }
+
+  function updateParticipant(sid: Participant.SID, e: HTMLElement | null) {
+    if (e == null) {
+      updateInfoElementProps(sid, null);
+    }
   }
 
   // We have to forward VideoContext into the Canvas - it has a different render-root
@@ -60,7 +68,7 @@ export default function Room() {
             {participants.map(participant => (
               <RemoteParticipant
                 key={participant.sid}
-                infoElement={infoElements.get(participant.sid) || null}
+                setInfoElementProps={p => updateInfoElementProps(participant.sid, p)}
                 participant={participant}
                 requestLocation={setLocationRequested}
               />
@@ -68,17 +76,29 @@ export default function Room() {
           </World>
         </VideoContext.Provider>
       </Canvas>
-      {participants.map(participant => (
-        <div
-          ref={e => updateInfoElements(participant.sid, e)}
-          key={participant.sid}
-          style={{ position: 'absolute', top: 0, left: 0 }}
-        >
-          <div style={{ transform: 'translate3d(-50%,-100%,0)' }}>
-            <ParticipantInfo participant={participant} />
-          </div>
-        </div>
-      ))}
+      {participants
+        .filter(participant => infoElementProps.has(participant.sid))
+        .map(participant => {
+          const elementProps = infoElementProps.get(participant.sid)!;
+          return (
+            <div
+              key={participant.sid}
+              ref={e => updateParticipant(participant.sid, e)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                transform:
+                  'translate3d(' + elementProps.x + 'px,' + elementProps.y + 'px,0) scale(' + elementProps.scale + ')',
+                opacity: elementProps.opacity,
+              }}
+            >
+              <div style={{ transform: 'translate3d(-50%,-100%,0)' }}>
+                <ParticipantInfo participant={participant} />
+              </div>
+            </div>
+          );
+        })}
     </CanvasContainer>
   );
 }

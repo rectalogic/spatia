@@ -3,7 +3,7 @@ import { RemoteParticipantTracks } from '../ParticipantTracks/ParticipantTracks'
 import { RemoteParticipant as IRemoteParticipant, Track } from 'twilio-video';
 import { ParticipantLocation, RequestLocationCallback } from './ParticipantLocation';
 import { ReactThreeFiber, PointerEvent, useFrame } from 'react-three-fiber';
-import Dom3D from '../Dom3D/Dom3D';
+import Dom3D, { Dom3DElementProps } from '../Dom3D/Dom3D';
 import * as THREE from 'three';
 import { VIDEO_MAX_DISTANCE, AUDIO_MAX_DISTANCE } from '../../Globals';
 
@@ -30,11 +30,15 @@ function Direction({ color, position, scale }: DirectionProps) {
 
 export interface RemoteParticipantProps {
   participant: IRemoteParticipant;
-  infoElement: HTMLElement | null;
+  setInfoElementProps: (props: Dom3DElementProps) => void;
   requestLocation: RequestLocationCallback;
 }
 
-export default function RemoteParticipant({ participant, infoElement, requestLocation }: RemoteParticipantProps) {
+export default function RemoteParticipant({
+  participant,
+  setInfoElementProps,
+  requestLocation,
+}: RemoteParticipantProps) {
   const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
   const [videoPriority, setVideoPriority] = useState<Track.Priority | null>('standard');
   const [audioPriority, setAudioPriority] = useState<Track.Priority | null>('standard');
@@ -104,7 +108,7 @@ export default function RemoteParticipant({ participant, infoElement, requestLoc
   return (
     <group position={[participantLocation.x, 1, participantLocation.z]} rotation-y={participantLocation.ry}>
       <group scale={[2, 2, 1]} onPointerOver={onPointerOver} onPointerOut={onPointerOut}>
-        <Dom3D element={infoElement} scale={infoScale} position={[0, 0.5, 0]} />
+        <Dom3D setElementProps={setInfoElementProps} scale={infoScale} position={[0, 0.5, 0]} />
         <RemoteParticipantTracks
           participant={participant}
           videoPriority={videoPriority}
