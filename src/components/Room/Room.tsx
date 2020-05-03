@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Canvas, PointerEvent } from 'react-three-fiber';
+import { PointerEvent } from 'react-three-fiber';
 import RemoteParticipant from '../Participant/RemoteParticipant';
 import LocalParticipant from '../Participant/LocalParticipant';
 import { styled } from '@material-ui/core/styles';

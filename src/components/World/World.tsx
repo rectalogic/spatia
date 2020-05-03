@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useThree, ReactThreeFiber } from 'react-three-fiber';
 import * as THREE from 'three';
 import { WORLD_SIZE, PORTAL_RADIUS, PORTALS } from '../../Globals';
@@ -14,27 +14,33 @@ import normalStone from './Textures/Ground/stone_normal.png';
 import roughnessStone from './Textures/Ground/stone_roughness.png';
 
 interface GroundProps {
-  envMap: THREE.CubeTexture;
+  envMap: THREE.CubeTexture | null;
 }
 
 function Ground({ envMap }: GroundProps) {
   const ref = useRef<THREE.PlaneBufferGeometry>(null);
-
-  const loader = new THREE.TextureLoader();
-  function loadTexture(url: string) {
-    const tex = loader.load(url);
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(WORLD_SIZE / 6, WORLD_SIZE / 6);
-    return tex;
-  }
-  const albedoMap = useRef(loadTexture(albedoStone));
-  const heightMap = useRef(loadTexture(heightStone));
-  const normalMap = useRef(loadTexture(normalStone));
-  const roughnessMap = useRef(loadTexture(roughnessStone));
+  const [albedoMap, setAlbedoMap] = useState<THREE.Texture | null>();
+  const [heightMap, setHeightMap] = useState<THREE.Texture | null>();
+  const [normalMap, setNormalMap] = useState<THREE.Texture | null>();
+  const [roughnessMap, setRoughnessMap] = useState<THREE.Texture | null>();
 
   useEffect(() => {
     ref.current!.rotateX(-Math.PI / 2);
   }, [ref]);
+
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    function loadTexture(url: string) {
+      const tex = loader.load(url);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(WORLD_SIZE / 6, WORLD_SIZE / 6);
+      return tex;
+    }
+    setAlbedoMap(loadTexture(albedoStone));
+    setHeightMap(loadTexture(heightStone));
+    setNormalMap(loadTexture(normalStone));
+    setRoughnessMap(loadTexture(roughnessStone));
+  }, []);
 
   return (
     <mesh>
@@ -42,10 +48,10 @@ function Ground({ envMap }: GroundProps) {
       <meshStandardMaterial
         attach="material"
         envMap={envMap}
-        roughnessMap={roughnessMap.current}
-        displacementMap={heightMap.current}
-        normalMap={normalMap.current}
-        map={albedoMap.current}
+        roughnessMap={roughnessMap}
+        displacementMap={heightMap}
+        normalMap={normalMap}
+        map={albedoMap}
       />
     </mesh>
   );
@@ -54,7 +60,7 @@ function Ground({ envMap }: GroundProps) {
 interface PortalProps {
   position: ReactThreeFiber.Vector3;
   color: ReactThreeFiber.Color;
-  envMap: THREE.CubeTexture;
+  envMap: THREE.CubeTexture | null;
 }
 
 function Portal({ position, color, envMap }: PortalProps) {
@@ -72,8 +78,12 @@ interface WorldProps {
 
 export default function World({ children }: WorldProps) {
   const { scene } = useThree();
-  const urls = [pxCube, nxCube, pyCube, nyCube, pzCube, nzCube];
-  const cubeTexture = new THREE.CubeTextureLoader().load(urls, texture => (scene.background = texture));
+  const [cubeTexture, setCubeTexture] = useState<THREE.CubeTexture | null>(null);
+  useEffect(() => {
+    const urls = [pxCube, nxCube, pyCube, nyCube, pzCube, nzCube];
+    setCubeTexture(new THREE.CubeTextureLoader().load(urls, texture => (scene.background = texture)));
+  }, [scene.background]);
+
   return (
     <>
       <ambientLight args={[0xffad5e, 0.3]} />
