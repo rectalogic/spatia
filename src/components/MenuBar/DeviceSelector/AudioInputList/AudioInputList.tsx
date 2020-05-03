@@ -4,6 +4,7 @@ import LocalAudioLevelIndicator from '../LocalAudioLevelIndicator/LocalAudioLeve
 import { makeStyles } from '@material-ui/core/styles';
 import { useAudioInputDevices } from '../deviceHooks/deviceHooks';
 import useVideoContext from '../../../../hooks/useVideoContext/useVideoContext';
+import { LocalAudioTrack } from 'twilio-video';
 
 const useStyles = makeStyles({
   container: {
@@ -22,7 +23,7 @@ export default function AudioInputList() {
     getLocalAudioTrack,
   } = useVideoContext();
 
-  const localAudioTrack = localTracks.find(track => track.kind === 'audio');
+  const localAudioTrack = localTracks.find(track => track.kind === 'audio') as LocalAudioTrack;
   const localAudioInputDeviceId = localAudioTrack?.mediaStreamTrack.getSettings().deviceId;
 
   function replaceTrack(newDeviceId: string) {

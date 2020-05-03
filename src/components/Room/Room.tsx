@@ -9,6 +9,7 @@ import { VideoContext } from '../../components/VideoProvider';
 import World from '../World/World';
 import { Track, Participant } from 'twilio-video';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
+import { useAppState, StateContext } from '../../state';
 
 const CanvasContainer = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -21,6 +22,7 @@ export default function Room() {
   const {
     room: { localParticipant },
   } = videoContext;
+  const appState = useAppState();
   const participants = useParticipants();
   const [controlling, setControlling] = useState(false);
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
@@ -51,21 +53,23 @@ export default function Room() {
     <CanvasContainer>
       <Canvas onMouseDown={onStartController} onMouseLeave={onStopController} onMouseUp={onStopController}>
         <VideoContext.Provider value={videoContext}>
-          <World>
-            <LocalParticipant
-              participant={localParticipant}
-              controlling={controlling}
-              locationRequested={locationRequested}
-            />
-            {participants.map(participant => (
-              <RemoteParticipant
-                key={participant.sid}
-                infoElement={infoElements.get(participant.sid) || null}
-                participant={participant}
-                requestLocation={setLocationRequested}
+          <StateContext.Provider value={appState}>
+            <World>
+              <LocalParticipant
+                participant={localParticipant}
+                controlling={controlling}
+                locationRequested={locationRequested}
               />
-            ))}
-          </World>
+              {participants.map(participant => (
+                <RemoteParticipant
+                  key={participant.sid}
+                  infoElement={infoElements.get(participant.sid) || null}
+                  participant={participant}
+                  requestLocation={setLocationRequested}
+                />
+              ))}
+            </World>
+          </StateContext.Provider>
         </VideoContext.Provider>
       </Canvas>
       {participants.map(participant => (

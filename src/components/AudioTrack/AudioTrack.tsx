@@ -31,7 +31,7 @@ export default function RemoteAudioTrack3D({ track, priority }: RemoteAudioTrack
 
   useEffect(() => {
     audio.setSinkId?.(activeSinkId);
-  }, [activeSinkId]);
+  }, [audio, activeSinkId]);
 
   const listener = camera.getObjectByName('audioListener') as THREE.AudioListener;
   return <positionalAudio ref={ref} args={[listener]} />;

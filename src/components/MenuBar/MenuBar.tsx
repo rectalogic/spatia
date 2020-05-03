@@ -16,7 +16,6 @@ import { Typography } from '@material-ui/core';
 import FlipCameraButton from './FlipCameraButton/FlipCameraButton';
 import { DeviceSelector } from './DeviceSelector/DeviceSelector';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
-import LocalAudioLevelIndicator from './DeviceSelector/LocalAudioLevelIndicator/LocalAudioLevelIndicator';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -140,7 +139,6 @@ export default function MenuBar() {
         )}
         <div className={classes.rightButtonContainer}>
           {roomState === 'disconnected' || <ParticipantInfo participant={localParticipant} isLocal />}
-          <LocalAudioLevelIndicator />
           <FlipCameraButton />
           <DeviceSelector />
           <Menu />

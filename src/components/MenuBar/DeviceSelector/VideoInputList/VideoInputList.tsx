@@ -4,7 +4,7 @@ import { LocalVideoTrack } from 'twilio-video';
 import { makeStyles } from '@material-ui/core/styles';
 import useVideoContext from '../../../../hooks/useVideoContext/useVideoContext';
 import { useVideoInputDevices } from '../deviceHooks/deviceHooks';
-import VideoTrack from '../../../VideoTrack/VideoTrack';
+import { VideoTrack } from '../../../VideoTrack/VideoTrack';
 
 const useStyles = makeStyles({
   preview: {
