@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { LocalParticipant as ILocalParticipant, Track } from 'twilio-video';
-import { useThree, useFrame } from 'react-three-fiber';
+import { useThree } from 'react-three-fiber';
 import * as THREE from 'three';
 import { LocalParticipantTracks } from '../ParticipantTracks/ParticipantTracks';
-import { ParticipantLocation, positionAroundPortal } from '../Participant/ParticipantLocation';
-import { WORLD_SIZE, CAMERA_FOV, PORTALS } from '../../Globals';
-
-const MAXPOS = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
-const MINPOS = new THREE.Vector3(-WORLD_SIZE / 2, 0, -WORLD_SIZE / 2);
+import { ParticipantLocation } from '../Participant/ParticipantLocation';
+import { WORLD_SIZE, CAMERA_FOV } from '../../Globals';
 
 function useCombinedRefs<T>(...refs: (React.MutableRefObject<T> | React.RefCallback<T> | null)[]): React.RefObject<T> {
   const targetRef = useRef<T>(null);
@@ -55,32 +52,18 @@ const Camera = React.forwardRef<THREE.PerspectiveCamera>((_props, forwardRef) =>
 
 export interface LocalParticipantProps {
   participant: ILocalParticipant;
-  controlling: boolean;
+  participantLocation: ParticipantLocation;
   locationRequested: Track.SID;
 }
 
-export default function LocalParticipant({ participant, controlling, locationRequested }: LocalParticipantProps) {
-  // Randomly position ourself around the portal perimeter
-  const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>(() => {
-    return positionAroundPortal(PORTALS[0]['position']);
-  });
+export default function LocalParticipant({
+  participant,
+  participantLocation,
+  locationRequested,
+}: LocalParticipantProps) {
   const cameraRef = useRef<THREE.PerspectiveCamera>(null);
   const participantRef = useRef<THREE.Object3D>(null);
   const tracksRef = useRef<THREE.Object3D>(null);
-
-  useFrame(({ mouse }) => {
-    if (controlling) {
-      const participant = participantRef.current;
-      if (participant) {
-        participant.translateZ(-mouse.y / 10);
-        // Don't allow walking off the world
-        participant.position.clamp(MINPOS, MAXPOS);
-        participant.rotation.y += -mouse.x / 100;
-
-        setParticipantLocation({ x: participant.position.x, z: participant.position.z, ry: participant.rotation.y });
-      }
-    }
-  });
 
   useEffect(() => {
     const tracks = tracksRef.current;

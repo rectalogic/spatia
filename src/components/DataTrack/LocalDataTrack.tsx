@@ -14,7 +14,7 @@ export default function LocalDataTrack({ track, location, locationRequested }: D
     track.send(new Float64Array(1));
   }, [track]);
 
-  // When locationRequested changes, send a trigger so all other participants resend their location
+  // When locationRequested changes, a remote participant is requesting a location resend
   useEffect(() => {
     track.send(new Float64Array([location.x, location.z, location.ry]));
   }, [track, location, locationRequested]);

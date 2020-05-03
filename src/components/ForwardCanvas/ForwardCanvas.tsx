@@ -5,6 +5,8 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { VideoContext } from '../../components/VideoProvider';
 import { useAppState, StateContext } from '../../state';
 
+// We have to forward VideoContext into the Canvas - it has a different render-root
+// https://github.com/react-spring/react-three-fiber/issues/262
 export default function ForwardCanvas({ children, ...props }: ContainerProps) {
   const videoContext = useVideoContext();
   const appState = useAppState();

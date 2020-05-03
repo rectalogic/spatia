@@ -1,38 +1,23 @@
 import React, { useState } from 'react';
-import { PointerEvent } from 'react-three-fiber';
 import RemoteParticipant from '../Participant/RemoteParticipant';
 import LocalParticipant from '../Participant/LocalParticipant';
-import { styled } from '@material-ui/core/styles';
 import useParticipants from '../../hooks/useParticipants/useParticipants';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import World from '../World/World';
 import { Track, Participant } from 'twilio-video';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
 import ForwardCanvas from '../ForwardCanvas/ForwardCanvas';
-
-const CanvasContainer = styled('div')(({ theme }) => ({
-  position: 'relative',
-  height: '100%',
-  width: '100%',
-}));
+import { ParticipantLocation } from '../Participant/ParticipantLocation';
+import Controller from '../Controller/Controller';
 
 export default function Room() {
   const {
     room: { localParticipant },
   } = useVideoContext();
   const participants = useParticipants();
-  const [controlling, setControlling] = useState(false);
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
   const [infoElements, setInfoElements] = useState<Map<Participant.SID, HTMLElement>>(new Map());
-
-  function onStartController(e: PointerEvent) {
-    e.stopPropagation();
-    setControlling(true);
-  }
-
-  function onStopController(e: PointerEvent) {
-    setControlling(false);
-  }
+  const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
 
   // https://github.com/facebook/react/issues/1899
   function updateInfoElements(sid: Participant.SID, e: HTMLElement | null) {
@@ -44,15 +29,13 @@ export default function Room() {
     setInfoElements(infoElements);
   }
 
-  // We have to forward VideoContext into the Canvas - it has a different render-root
-  // https://github.com/react-spring/react-three-fiber/issues/262
   return (
-    <CanvasContainer>
-      <ForwardCanvas onMouseDown={onStartController} onMouseLeave={onStopController} onMouseUp={onStopController}>
+    <Controller setLocalParticipantLocation={setLocalParticipantLocation}>
+      <ForwardCanvas>
         <World>
           <LocalParticipant
             participant={localParticipant}
-            controlling={controlling}
+            participantLocation={localParticipantLocation}
             locationRequested={locationRequested}
           />
           {participants.map(participant => (
@@ -76,6 +59,6 @@ export default function Room() {
           </div>
         </div>
       ))}
-    </CanvasContainer>
+    </Controller>
   );
 }
