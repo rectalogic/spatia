@@ -5,11 +5,10 @@ import LocalParticipant from '../Participant/LocalParticipant';
 import { styled } from '@material-ui/core/styles';
 import useParticipants from '../../hooks/useParticipants/useParticipants';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import { VideoContext } from '../../components/VideoProvider';
 import World from '../World/World';
 import { Track, Participant } from 'twilio-video';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
-import { useAppState, StateContext } from '../../state';
+import ForwardCanvas from '../ForwardCanvas/ForwardCanvas';
 
 const CanvasContainer = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -18,11 +17,9 @@ const CanvasContainer = styled('div')(({ theme }) => ({
 }));
 
 export default function Room() {
-  const videoContext = useVideoContext();
   const {
     room: { localParticipant },
-  } = videoContext;
-  const appState = useAppState();
+  } = useVideoContext();
   const participants = useParticipants();
   const [controlling, setControlling] = useState(false);
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
@@ -51,27 +48,23 @@ export default function Room() {
   // https://github.com/react-spring/react-three-fiber/issues/262
   return (
     <CanvasContainer>
-      <Canvas onMouseDown={onStartController} onMouseLeave={onStopController} onMouseUp={onStopController}>
-        <VideoContext.Provider value={videoContext}>
-          <StateContext.Provider value={appState}>
-            <World>
-              <LocalParticipant
-                participant={localParticipant}
-                controlling={controlling}
-                locationRequested={locationRequested}
-              />
-              {participants.map(participant => (
-                <RemoteParticipant
-                  key={participant.sid}
-                  infoElement={infoElements.get(participant.sid) || null}
-                  participant={participant}
-                  requestLocation={setLocationRequested}
-                />
-              ))}
-            </World>
-          </StateContext.Provider>
-        </VideoContext.Provider>
-      </Canvas>
+      <ForwardCanvas onMouseDown={onStartController} onMouseLeave={onStopController} onMouseUp={onStopController}>
+        <World>
+          <LocalParticipant
+            participant={localParticipant}
+            controlling={controlling}
+            locationRequested={locationRequested}
+          />
+          {participants.map(participant => (
+            <RemoteParticipant
+              key={participant.sid}
+              infoElement={infoElements.get(participant.sid) || null}
+              participant={participant}
+              requestLocation={setLocationRequested}
+            />
+          ))}
+        </World>
+      </ForwardCanvas>
       {participants.map(participant => (
         <div
           ref={e => updateInfoElements(participant.sid, e)}
