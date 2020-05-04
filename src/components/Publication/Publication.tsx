@@ -1,7 +1,7 @@
 import React from 'react';
 import useTrack from '../../hooks/useTrack/useTrack';
 import RemoteAudioTrack3D from '../AudioTrack/AudioTrack';
-import VideoTrack3D, { VideoTrack } from '../VideoTrack/VideoTrack';
+import VideoTrack from '../VideoTrack/VideoTrack';
 import LocalDataTrack from '../DataTrack/LocalDataTrack';
 import RemoteDataTrack from '../DataTrack/RemoteDataTrack';
 import { ParticipantLocation, LocationCallback, RequestLocationCallback } from '../Participant/ParticipantLocation';
@@ -39,7 +39,6 @@ export function LocalPublication({ publication, location, locationRequested }: L
 
   switch (track.kind) {
     case 'video':
-      // Center point is top middle
       return <VideoTrack track={track as IVideoTrack} isLocal priority="standard" />;
     case 'audio':
       return null;
@@ -77,7 +76,7 @@ export function RemotePublication({
   switch (track.kind) {
     case 'video':
       return videoPriority && RenderTracks.Video === (renderTracks & RenderTracks.Video) ? (
-        <VideoTrack3D track={track as IVideoTrack} priority={videoPriority} />
+        <VideoTrack track={track as IVideoTrack} priority={videoPriority} />
       ) : null;
     case 'audio':
       return audioPriority && RenderTracks.Audio === (renderTracks & RenderTracks.Audio) ? (
