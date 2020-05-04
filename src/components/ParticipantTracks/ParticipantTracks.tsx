@@ -4,9 +4,16 @@ import {
   RemoteParticipant,
   Track,
   LocalTrackPublication,
-  RemoteTrackPublication,
+  RemoteVideoTrackPublication,
+  RemoteAudioTrackPublication,
+  RemoteDataTrackPublication,
 } from 'twilio-video';
-import { LocalPublication, RemotePublication, RenderTracks } from '../Publication/Publication';
+import {
+  LocalPublication,
+  RemoteVideoPublication,
+  RemoteAudioPublication,
+  RemoteDataPublication,
+} from '../Publication/Publication';
 import usePublications from '../../hooks/usePublications/usePublications';
 import { LocationCallback, ParticipantLocation, RequestLocationCallback } from '../Participant/ParticipantLocation';
 
@@ -41,39 +48,61 @@ export function LocalParticipantTracks({ participant, location, locationRequeste
   );
 }
 
-interface RemoteParticipantTracksProps {
+interface RemoteParticipantVideoTracksProps {
   participant: RemoteParticipant;
-  videoPriority: Track.Priority | null;
-  audioPriority: Track.Priority | null;
-  onLocationChange: LocationCallback;
-  requestLocation: RequestLocationCallback;
-  renderTracks: RenderTracks;
 }
-
-export function RemoteParticipantTracks({
-  participant,
-  videoPriority,
-  audioPriority,
-  onLocationChange,
-  requestLocation,
-  renderTracks,
-}: RemoteParticipantTracksProps) {
+export function RemoteParticipantVideoTracks({ participant }: RemoteParticipantVideoTracksProps) {
   const publications = usePublications(participant);
-
   return (
     <>
-      {publications.map(publication => (
-        <RemotePublication
-          key={publication.kind}
-          publication={publication as RemoteTrackPublication}
-          participant={participant}
-          videoPriority={videoPriority}
-          audioPriority={audioPriority}
-          onLocationChange={onLocationChange}
-          requestLocation={requestLocation}
-          renderTracks={renderTracks}
-        />
-      ))}
+      {publications.map(publication =>
+        publication.kind === 'video' ? (
+          <RemoteVideoPublication key={publication.kind} publication={publication as RemoteVideoTrackPublication} />
+        ) : null
+      )}
+    </>
+  );
+}
+
+interface RemoteParticipantAudioTracksProps {
+  participant: RemoteParticipant;
+}
+export function RemoteParticipantAudioTracks({ participant }: RemoteParticipantAudioTracksProps) {
+  const publications = usePublications(participant);
+  return (
+    <>
+      {publications.map(publication =>
+        publication.kind === 'audio' ? (
+          <RemoteAudioPublication key={publication.kind} publication={publication as RemoteAudioTrackPublication} />
+        ) : null
+      )}
+    </>
+  );
+}
+
+interface RemoteParticipantDataTracksProps {
+  participant: RemoteParticipant;
+  onLocationChange: LocationCallback;
+  requestLocation: RequestLocationCallback;
+}
+export function RemoteParticipantDataTracks({
+  participant,
+  onLocationChange,
+  requestLocation,
+}: RemoteParticipantDataTracksProps) {
+  const publications = usePublications(participant);
+  return (
+    <>
+      {publications.map(publication =>
+        publication.kind === 'data' ? (
+          <RemoteDataPublication
+            key={publication.kind}
+            publication={publication as RemoteDataTrackPublication}
+            onLocationChange={onLocationChange}
+            requestLocation={requestLocation}
+          />
+        ) : null
+      )}
     </>
   );
 }

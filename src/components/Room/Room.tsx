@@ -12,8 +12,8 @@ import { ParticipantLocation } from '../Participant/ParticipantLocation';
 import Controller from '../Controller/Controller';
 import Camera from '../Camera/Camera';
 import DomPortal from '../DomPortal/DomPortal';
-import { RenderTracks } from '../Publication/Publication';
 import ForwardCanvasCSS from '../ForwardCanvasCSS/ForwardCanvasCSS';
+import { RemoteParticipantVideoTracks } from '../ParticipantTracks/ParticipantTracks';
 
 interface ParticipantObjects {
   sid: Participant.SID;
@@ -59,17 +59,16 @@ export default function Room() {
         >
           <Camera renderer="css3d" hasListener />
         </group>
-        {participantObjects.map(po => {
-          const participant = participants.find(p => p.sid === po.sid);
+        {participants.map(participant => {
+          const po = participantObjects.find(po => po.sid === participant.sid);
           return (
-            participant && (
-              <primitive key={po.sid} object={po.object}>
-                <RemoteParticipant
-                  participant={participant}
-                  requestLocation={setLocationRequested}
-                  renderTracks={RenderTracks.Audio | RenderTracks.Data}
-                />
-              </primitive>
+            po && (
+              <RemoteParticipant
+                key={participant.sid}
+                participant={participant}
+                object={po.object}
+                requestLocation={setLocationRequested}
+              />
             )
           );
         })}
@@ -89,11 +88,7 @@ export default function Room() {
         {participants.map(participant => (
           <div key={participant.sid} ref={e => updateParticipantElements(participant.sid, e)}>
             <ParticipantInfo participant={participant}>
-              <RemoteParticipant
-                participant={participant}
-                requestLocation={setLocationRequested}
-                renderTracks={RenderTracks.Video}
-              />
+              <RemoteParticipantVideoTracks participant={participant} />
             </ParticipantInfo>
           </div>
         ))}

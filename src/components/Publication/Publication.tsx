@@ -12,18 +12,12 @@ import {
   LocalDataTrack as ILocalDataTrack,
   RemoteDataTrack as IRemoteDataTrack,
   LocalTrackPublication,
-  RemoteTrackPublication,
   Track,
   LocalParticipant,
-  RemoteParticipant,
+  RemoteVideoTrackPublication,
+  RemoteAudioTrackPublication,
+  RemoteDataTrackPublication,
 } from 'twilio-video';
-
-export enum RenderTracks {
-  None = 0,
-  Audio = 1 << 1,
-  Video = 1 << 2,
-  Data = 1 << 3,
-}
 
 interface LocalPublicationProps {
   publication: LocalTrackPublication;
@@ -51,46 +45,38 @@ export function LocalPublication({ publication, location, locationRequested }: L
   }
 }
 
-interface RemotePublicationProps {
-  publication: RemoteTrackPublication;
-  participant: RemoteParticipant;
-  videoPriority: Track.Priority | null;
-  audioPriority: Track.Priority | null;
-  onLocationChange: LocationCallback;
-  requestLocation: RequestLocationCallback;
-  renderTracks: RenderTracks;
+interface RemoteVideoPublicationProps {
+  publication: RemoteVideoTrackPublication;
+}
+export function RemoteVideoPublication({ publication }: RemoteVideoPublicationProps) {
+  const track = useTrack(publication);
+  if (!track) return null;
+  return <VideoTrack track={track as IVideoTrack} />;
 }
 
-export function RemotePublication({
-  publication,
-  videoPriority,
-  audioPriority,
-  onLocationChange,
-  requestLocation,
-  renderTracks,
-}: RemotePublicationProps) {
+interface RemoteAudioPublicationProps {
+  publication: RemoteAudioTrackPublication;
+}
+export function RemoteAudioPublication({ publication }: RemoteAudioPublicationProps) {
+  const track = useTrack(publication);
+  if (!track) return null;
+  return <RemoteAudioTrack3D track={track as IRemoteAudioTrack} />;
+}
+
+interface RemoteDataPublicationProps {
+  publication: RemoteDataTrackPublication;
+  onLocationChange: LocationCallback;
+  requestLocation: RequestLocationCallback;
+}
+export function RemoteDataPublication({ publication, onLocationChange, requestLocation }: RemoteDataPublicationProps) {
   const track = useTrack(publication);
 
   if (!track) return null;
-
-  switch (track.kind) {
-    case 'video':
-      return videoPriority && RenderTracks.Video === (renderTracks & RenderTracks.Video) ? (
-        <VideoTrack track={track as IVideoTrack} priority={videoPriority} />
-      ) : null;
-    case 'audio':
-      return audioPriority && RenderTracks.Audio === (renderTracks & RenderTracks.Audio) ? (
-        <RemoteAudioTrack3D track={track as IRemoteAudioTrack} priority={audioPriority} />
-      ) : null;
-    case 'data':
-      return RenderTracks.Data === (renderTracks & RenderTracks.Data) ? (
-        <RemoteDataTrack
-          track={track as IRemoteDataTrack}
-          onLocationChange={onLocationChange}
-          requestLocation={requestLocation}
-        />
-      ) : null;
-    default:
-      return null;
-  }
+  return (
+    <RemoteDataTrack
+      track={track as IRemoteDataTrack}
+      onLocationChange={onLocationChange}
+      requestLocation={requestLocation}
+    />
+  );
 }
