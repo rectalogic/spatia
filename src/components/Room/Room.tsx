@@ -74,13 +74,17 @@ export default function Room() {
           );
         })}
       </ForwardCanvasCSS>
-      <ParticipantInfo participant={localParticipant}>
-        <LocalParticipant
-          participant={localParticipant}
-          participantLocation={localParticipantLocation}
-          locationRequested={locationRequested}
-        />
-      </ParticipantInfo>
+      <div style={{ position: 'absolute', top: '0', left: '50%' }}>
+        <div style={{ position: 'relative', left: '-50%' }}>
+          <ParticipantInfo participant={localParticipant}>
+            <LocalParticipant
+              participant={localParticipant}
+              participantLocation={localParticipantLocation}
+              locationRequested={locationRequested}
+            />
+          </ParticipantInfo>
+        </div>
+      </div>
       <DomPortal>
         {participants.map(participant => (
           <div key={participant.sid} ref={e => updateParticipantElements(participant.sid, e)}>
