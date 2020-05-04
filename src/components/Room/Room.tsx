@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Canvas as CanvasGL } from 'react-three-fiber';
+import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
 import RemoteParticipant from '../Participant/RemoteParticipant';
 import LocalParticipant from '../Participant/LocalParticipant';
 import useParticipants from '../../hooks/useParticipants/useParticipants';
@@ -6,9 +8,17 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import World from '../World/World';
 import { Track, Participant } from 'twilio-video';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
-import ForwardCanvas from '../ForwardCanvas/ForwardCanvas';
 import { ParticipantLocation } from '../Participant/ParticipantLocation';
 import Controller from '../Controller/Controller';
+import Camera from '../Camera/Camera';
+import DomPortal from '../DomPortal/DomPortal';
+import { RenderTracks } from '../Publication/Publication';
+import ForwardCanvasCSS from '../ForwardCanvasCSS/ForwardCanvasCSS';
+
+interface ParticipantObjects {
+  sid: Participant.SID;
+  object: CSS3DObject;
+}
 
 export default function Room() {
   const {
@@ -16,49 +26,74 @@ export default function Room() {
   } = useVideoContext();
   const participants = useParticipants();
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
-  const [infoElements, setInfoElements] = useState<Map<Participant.SID, HTMLElement>>(new Map());
   const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
+  const [participantObjects, setParticipantObjects] = useState<ParticipantObjects[]>([]);
 
-  // https://github.com/facebook/react/issues/1899
-  function updateInfoElements(sid: Participant.SID, e: HTMLElement | null) {
-    if (e) {
-      infoElements.set(sid, e);
+  function updateParticipantElements(sid: Participant.SID, element: HTMLElement | null) {
+    if (element == null) {
+      setParticipantObjects(participantObjects => participantObjects.filter(po => po.sid !== sid));
     } else {
-      infoElements.delete(sid);
+      setParticipantObjects(participantObjects => [
+        { sid: sid, object: new CSS3DObject(element) },
+        ...participantObjects.filter(po => po.sid === sid),
+      ]);
     }
-    setInfoElements(infoElements);
   }
 
   return (
     <Controller setLocalParticipantLocation={setLocalParticipantLocation}>
-      <ForwardCanvas>
+      <CanvasGL>
         <World>
-          <LocalParticipant
-            participant={localParticipant}
-            participantLocation={localParticipantLocation}
-            locationRequested={locationRequested}
-          />
-          {participants.map(participant => (
-            <RemoteParticipant
-              key={participant.sid}
-              infoElement={infoElements.get(participant.sid) || null}
-              participant={participant}
-              requestLocation={setLocationRequested}
-            />
-          ))}
+          <group
+            position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
+            rotation-y={localParticipantLocation.ry}
+          >
+            <Camera renderer="webgl" />
+          </group>
         </World>
-      </ForwardCanvas>
-      {participants.map(participant => (
-        <div
-          ref={e => updateInfoElements(participant.sid, e)}
-          key={participant.sid}
-          style={{ position: 'absolute', top: 0, left: 0 }}
+      </CanvasGL>
+      <ForwardCanvasCSS>
+        <group
+          position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
+          rotation-y={localParticipantLocation.ry}
         >
-          <div style={{ transform: 'translate3d(-50%,-100%,0)' }}>
-            <ParticipantInfo participant={participant} />
+          <Camera renderer="css3d" hasListener />
+        </group>
+        {participantObjects.map(po => {
+          const participant = participants.find(p => p.sid === po.sid);
+          return (
+            participant && (
+              <primitive key={po.sid} object={po.object}>
+                <RemoteParticipant
+                  participant={participant}
+                  requestLocation={setLocationRequested}
+                  renderTracks={RenderTracks.Audio | RenderTracks.Data}
+                />
+              </primitive>
+            )
+          );
+        })}
+      </ForwardCanvasCSS>
+      <ParticipantInfo participant={localParticipant}>
+        <LocalParticipant
+          participant={localParticipant}
+          participantLocation={localParticipantLocation}
+          locationRequested={locationRequested}
+        />
+      </ParticipantInfo>
+      <DomPortal>
+        {participants.map(participant => (
+          <div key={participant.sid} ref={e => updateParticipantElements(participant.sid, e)}>
+            <ParticipantInfo participant={participant}>
+              <RemoteParticipant
+                participant={participant}
+                requestLocation={setLocationRequested}
+                renderTracks={RenderTracks.Video}
+              />
+            </ParticipantInfo>
           </div>
-        </div>
-      ))}
+        ))}
+      </DomPortal>
     </Controller>
   );
 }

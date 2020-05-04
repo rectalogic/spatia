@@ -6,7 +6,7 @@ import {
   LocalTrackPublication,
   RemoteTrackPublication,
 } from 'twilio-video';
-import { LocalPublication, RemotePublication } from '../Publication/Publication';
+import { LocalPublication, RemotePublication, RenderTracks } from '../Publication/Publication';
 import usePublications from '../../hooks/usePublications/usePublications';
 import { LocationCallback, ParticipantLocation, RequestLocationCallback } from '../Participant/ParticipantLocation';
 
@@ -47,6 +47,7 @@ interface RemoteParticipantTracksProps {
   audioPriority: Track.Priority | null;
   onLocationChange: LocationCallback;
   requestLocation: RequestLocationCallback;
+  renderTracks: RenderTracks;
 }
 
 export function RemoteParticipantTracks({
@@ -55,6 +56,7 @@ export function RemoteParticipantTracks({
   audioPriority,
   onLocationChange,
   requestLocation,
+  renderTracks,
 }: RemoteParticipantTracksProps) {
   const publications = usePublications(participant);
 
@@ -69,6 +71,7 @@ export function RemoteParticipantTracks({
           audioPriority={audioPriority}
           onLocationChange={onLocationChange}
           requestLocation={requestLocation}
+          renderTracks={renderTracks}
         />
       ))}
     </>

@@ -1,7 +1,7 @@
 import React from 'react';
 import useTrack from '../../hooks/useTrack/useTrack';
 import RemoteAudioTrack3D from '../AudioTrack/AudioTrack';
-import VideoTrack3D from '../VideoTrack/VideoTrack';
+import VideoTrack3D, { VideoTrack } from '../VideoTrack/VideoTrack';
 import LocalDataTrack from '../DataTrack/LocalDataTrack';
 import RemoteDataTrack from '../DataTrack/RemoteDataTrack';
 import { ParticipantLocation, LocationCallback, RequestLocationCallback } from '../Participant/ParticipantLocation';
@@ -18,6 +18,13 @@ import {
   RemoteParticipant,
 } from 'twilio-video';
 
+export enum RenderTracks {
+  None = 0,
+  Audio = 1 << 1,
+  Video = 1 << 2,
+  Data = 1 << 3,
+}
+
 interface LocalPublicationProps {
   publication: LocalTrackPublication;
   participant: LocalParticipant;
@@ -33,11 +40,7 @@ export function LocalPublication({ publication, location, locationRequested }: L
   switch (track.kind) {
     case 'video':
       // Center point is top middle
-      return (
-        <group position-y={-0.5}>
-          <VideoTrack3D track={track as IVideoTrack} priority="standard" />
-        </group>
-      );
+      return <VideoTrack track={track as IVideoTrack} isLocal priority="standard" />;
     case 'audio':
       return null;
     case 'data':
@@ -56,6 +59,7 @@ interface RemotePublicationProps {
   audioPriority: Track.Priority | null;
   onLocationChange: LocationCallback;
   requestLocation: RequestLocationCallback;
+  renderTracks: RenderTracks;
 }
 
 export function RemotePublication({
@@ -64,6 +68,7 @@ export function RemotePublication({
   audioPriority,
   onLocationChange,
   requestLocation,
+  renderTracks,
 }: RemotePublicationProps) {
   const track = useTrack(publication);
 
@@ -71,17 +76,21 @@ export function RemotePublication({
 
   switch (track.kind) {
     case 'video':
-      return videoPriority ? <VideoTrack3D track={track as IVideoTrack} priority={videoPriority} /> : null;
+      return videoPriority && RenderTracks.Video === (renderTracks & RenderTracks.Video) ? (
+        <VideoTrack3D track={track as IVideoTrack} priority={videoPriority} />
+      ) : null;
     case 'audio':
-      return audioPriority ? <RemoteAudioTrack3D track={track as IRemoteAudioTrack} priority={audioPriority} /> : null;
+      return audioPriority && RenderTracks.Audio === (renderTracks & RenderTracks.Audio) ? (
+        <RemoteAudioTrack3D track={track as IRemoteAudioTrack} priority={audioPriority} />
+      ) : null;
     case 'data':
-      return (
+      return RenderTracks.Data === (renderTracks & RenderTracks.Data) ? (
         <RemoteDataTrack
           track={track as IRemoteDataTrack}
           onLocationChange={onLocationChange}
           requestLocation={requestLocation}
         />
-      );
+      ) : null;
     default:
       return null;
   }
