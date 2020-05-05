@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useThree } from 'react-three-fiber';
+import { useThree } from 'react-three-fiber/css3d';
 import * as THREE from 'three';
 import { RemoteAudioTrack as IRemoteAudioTrack } from 'twilio-video';
 import { AUDIO_REF_DISTANCE } from '../../Globals';
