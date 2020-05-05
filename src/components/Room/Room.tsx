@@ -35,7 +35,7 @@ export default function Room() {
         </World>
       </CanvasGL>
 
-      <ForwardCanvasCSS>
+      <ForwardCanvasCSS style={{ position: 'absolute', top: '0' }}>
         <group
           position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
           rotation-y={localParticipantLocation.ry}

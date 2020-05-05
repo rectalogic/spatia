@@ -69,7 +69,7 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
   return (
     <group
       ref={groupRef}
-      position={[participantLocation.x, 2 * WORLD_SCALE, participantLocation.z]}
+      position={[participantLocation.x, WORLD_SCALE, participantLocation.z]}
       rotation-y={participantLocation.ry}
     >
       {disableAudio ? null : <RemoteParticipantAudioTracks participant={participant} />}
