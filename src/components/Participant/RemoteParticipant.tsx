@@ -5,14 +5,15 @@ import { RemoteParticipantAudioTracks, RemoteParticipantDataTracks } from '../Pa
 import { RemoteParticipant as IRemoteParticipant } from 'twilio-video';
 import { ParticipantLocation, RequestLocationCallback } from './ParticipantLocation';
 import { useFrame } from 'react-three-fiber/css3d';
-import { VIDEO_MAX_DISTANCE, AUDIO_MAX_DISTANCE } from '../../Globals';
+import { VIDEO_MAX_DISTANCE, AUDIO_MAX_DISTANCE, WORLD_SCALE } from '../../Globals';
 
 export interface RemoteParticipantProps {
   participant: IRemoteParticipant;
+  videoRef: React.MutableRefObject<HTMLElement | null>;
   requestLocation: RequestLocationCallback;
 }
 
-export default function RemoteParticipant({ participant, requestLocation }: RemoteParticipantProps) {
+export default function RemoteParticipant({ participant, videoRef, requestLocation }: RemoteParticipantProps) {
   const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
   const [disableVideo, setDisableVideo] = useState(false);
   const [disableAudio, setDisableAudio] = useState(false);
@@ -53,7 +54,7 @@ export default function RemoteParticipant({ participant, requestLocation }: Remo
   });
 
   useEffect(() => {
-    if (disableVideo) return;
+    if (disableVideo || videoRef.current === null) return;
     const element = document.getElementById('video' + participant.sid);
     if (element) {
       const group = groupRef.current;
@@ -63,12 +64,12 @@ export default function RemoteParticipant({ participant, requestLocation }: Remo
         group.remove(cssObject);
       };
     }
-  });
+  }, [disableVideo, participant, videoRef, groupRef]);
 
   return (
     <group
       ref={groupRef}
-      position={[participantLocation.x, 1, participantLocation.z]}
+      position={[participantLocation.x, 2 * WORLD_SCALE, participantLocation.z]}
       rotation-y={participantLocation.ry}
     >
       {disableAudio ? null : <RemoteParticipantAudioTracks participant={participant} />}

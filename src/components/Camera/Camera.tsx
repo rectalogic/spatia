@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import * as THREE from 'three';
 import { useThree as useThreeGL, useUpdate as useUpdateGL } from 'react-three-fiber';
 import { useThree as useThreeCSS, useUpdate as useUpdateCSS } from 'react-three-fiber/css3d';
-import { CAMERA_FOV, WORLD_SIZE } from '../../Globals';
+import { CAMERA_FOV, WORLD_SIZE, WORLD_SCALE } from '../../Globals';
 
 const RenderInfo = {
   css3d: {
@@ -37,10 +37,10 @@ export default function Camera({ renderer, hasListener }: CameraProps) {
     <perspectiveCamera
       ref={ref}
       fov={CAMERA_FOV}
-      near={0.1}
+      near={0.1 * WORLD_SCALE}
       far={WORLD_SIZE}
       rotation-x={-Math.PI / 24}
-      position={[0, 2, 0]}
+      position={[0, 2 * WORLD_SCALE, 0]}
     >
       {hasListener ? <audioListener name="audioListener" /> : null}
     </perspectiveCamera>

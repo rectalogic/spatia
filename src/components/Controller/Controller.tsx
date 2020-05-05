@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import useAnimationFrame from '../../hooks/useAnimationFrame/useAnimationFrame';
 import { ParticipantLocation, positionAroundPortal } from '../Participant/ParticipantLocation';
-import { PORTALS, WORLD_SIZE } from '../../Globals';
+import { PORTALS, WORLD_SIZE, WORLD_SCALE } from '../../Globals';
 import { styled } from '@material-ui/core/styles';
 
 const MAXPOS = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
@@ -32,9 +32,10 @@ export default function Controller({ setLocalParticipantLocation, children }: Co
   }, [setLocalParticipantLocation]);
 
   function computeAcceleration(e: React.MouseEvent) {
-    const target = e.target as HTMLElement;
+    const target = e.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
     setAcceleration(
-      new THREE.Vector2((e.clientX / target.clientWidth) * 2 - 1, -(e.clientY / target.clientHeight) * 2 + 1)
+      new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, (-(e.clientY - rect.top) / rect.height) * 2 + 1)
     );
   }
 
@@ -57,7 +58,7 @@ export default function Controller({ setLocalParticipantLocation, children }: Co
   useAnimationFrame(() => {
     if (acceleration) {
       const object = objectRef.current;
-      object.translateZ(-acceleration.y / 10);
+      object.translateZ(-acceleration.y * (WORLD_SCALE / 10));
       // Don't allow walking off the world
       object.position.clamp(MINPOS, MAXPOS);
       object.rotation.y += -acceleration.x / 100;

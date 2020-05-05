@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useThree, ReactThreeFiber } from 'react-three-fiber';
 import * as THREE from 'three';
-import { WORLD_SIZE, PORTAL_RADIUS, PORTALS } from '../../Globals';
+import { WORLD_SIZE, PORTAL_RADIUS, PORTALS, WORLD_SCALE } from '../../Globals';
 import pxCube from './Textures/SkyBox/px.png';
 import nxCube from './Textures/SkyBox/nx.png';
 import pyCube from './Textures/SkyBox/py.png';
@@ -33,7 +33,7 @@ function Ground({ envMap }: GroundProps) {
     function loadTexture(url: string) {
       const tex = loader.load(url);
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(WORLD_SIZE / 6, WORLD_SIZE / 6);
+      tex.repeat.set(WORLD_SIZE / (6 * WORLD_SCALE), WORLD_SIZE / (6 * WORLD_SCALE));
       return tex;
     }
     setAlbedoMap(loadTexture(albedoStone));
@@ -66,7 +66,7 @@ interface PortalProps {
 function Portal({ position, color, envMap }: PortalProps) {
   return (
     <mesh position={position}>
-      <cylinderBufferGeometry attach="geometry" args={[PORTAL_RADIUS, PORTAL_RADIUS, 1, 16]} />
+      <cylinderBufferGeometry attach="geometry" args={[PORTAL_RADIUS, PORTAL_RADIUS, WORLD_SCALE, 16]} />
       <meshStandardMaterial attach="material" color={color} metalness={1} roughness={0} envMap={envMap} />
     </mesh>
   );
@@ -87,7 +87,7 @@ export default function World({ children }: WorldProps) {
   return (
     <>
       <ambientLight args={[0xffad5e, 0.3]} />
-      <directionalLight args={[0xffffff, 1]} position={[0, 1, -2]} />
+      <directionalLight args={[0xffffff, 1]} position={[0, WORLD_SCALE, -2 * WORLD_SCALE]} />
       {children}
       {PORTALS.map(({ position, color }) => (
         <Portal key={position.toString()} position={position} color={color} envMap={cubeTexture} />

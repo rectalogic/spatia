@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Canvas as CanvasGL } from 'react-three-fiber';
 import RemoteParticipant from '../Participant/RemoteParticipant';
 import LocalParticipant from '../Participant/LocalParticipant';
@@ -20,6 +20,7 @@ export default function Room() {
   const participants = useParticipants();
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
   const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
+  const videoRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <Controller setLocalParticipantLocation={setLocalParticipantLocation}>
@@ -43,7 +44,12 @@ export default function Room() {
         </group>
         {participants.map(participant => {
           return (
-            <RemoteParticipant key={participant.sid} participant={participant} requestLocation={setLocationRequested} />
+            <RemoteParticipant
+              key={participant.sid}
+              participant={participant}
+              videoRef={videoRef}
+              requestLocation={setLocationRequested}
+            />
           );
         })}
       </ForwardCanvasCSS>
@@ -60,13 +66,15 @@ export default function Room() {
         </div>
       </div>
 
-      {participants.map(participant => (
-        <div id={'video' + participant.sid} key={participant.sid}>
-          <ParticipantInfo participant={participant}>
-            <RemoteParticipantVideoTracks participant={participant} />
-          </ParticipantInfo>
-        </div>
-      ))}
+      <div ref={videoRef}>
+        {participants.map(participant => (
+          <div id={'video' + participant.sid} key={participant.sid}>
+            <ParticipantInfo participant={participant}>
+              <RemoteParticipantVideoTracks participant={participant} />
+            </ParticipantInfo>
+          </div>
+        ))}
+      </div>
     </Controller>
   );
 }
