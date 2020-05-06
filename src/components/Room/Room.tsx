@@ -68,10 +68,13 @@ export default function Room() {
 
       <div ref={videoRef}>
         {participants.map(participant => (
-          <div id={'video' + participant.sid} key={participant.sid}>
-            <ParticipantInfo participant={participant}>
-              <RemoteParticipantVideoTracks participant={participant} />
-            </ParticipantInfo>
+          // Stable parent div since we reparent in the CSS3D canvas
+          <div key={participant.sid}>
+            <div id={'video' + participant.sid}>
+              <ParticipantInfo participant={participant}>
+                <RemoteParticipantVideoTracks participant={participant} />
+              </ParticipantInfo>
+            </div>
           </div>
         ))}
       </div>

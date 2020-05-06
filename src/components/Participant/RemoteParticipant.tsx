@@ -16,41 +16,21 @@ export interface RemoteParticipantProps {
 export default function RemoteParticipant({ participant, videoRef, requestLocation }: RemoteParticipantProps) {
   const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
   const [disableVideo, setDisableVideo] = useState(false);
-  const [disableAudio, setDisableAudio] = useState(false);
   const groupRef = useRef<THREE.Object3D>(null!);
-  const cameraPos = new THREE.Vector3();
-  const participantPos = new THREE.Vector3();
   const participantPos4 = new THREE.Vector4();
 
   const onLocationChange = (location: ParticipantLocation) => setParticipantLocation(location);
 
   useFrame(({ camera }) => {
-    let disableVideo = false;
-    let disableAudio = false;
-    camera.getWorldPosition(cameraPos);
-    participantPos.set(participantLocation.x, 0, participantLocation.z);
-    const distance = participantPos.distanceTo(cameraPos);
-
-    if (distance > VIDEO_MAX_DISTANCE) {
-      disableVideo = true;
+    participantPos4.set(participantLocation.x, 0, participantLocation.z, 1);
+    participantPos4.applyMatrix4(camera.matrixWorldInverse);
+    participantPos4.applyMatrix4(camera.projectionMatrix);
+    // Behind camera
+    if (participantPos4.w < 0) {
+      setDisableVideo(true);
+    } else {
+      setDisableVideo(false);
     }
-
-    if (distance > AUDIO_MAX_DISTANCE) {
-      disableAudio = true;
-    }
-
-    if (!disableVideo) {
-      participantPos4.set(participantLocation.x, 0, participantLocation.z, 1);
-      participantPos4.applyMatrix4(camera.matrixWorldInverse);
-      participantPos4.applyMatrix4(camera.projectionMatrix);
-      // Behind camera
-      if (participantPos4.w < 0) {
-        disableVideo = true;
-      }
-    }
-
-    setDisableVideo(disableVideo);
-    setDisableAudio(disableAudio);
   });
 
   useEffect(() => {
@@ -58,12 +38,16 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
     const element = document.getElementById('video' + participant.sid);
     if (element) {
       const group = groupRef.current;
+      // CSS3D reparents, save the current parent
+      const parent = element.parentElement;
       const cssObject = new CSS3DObject(element);
       // Flip
       cssObject.rotateY(Math.PI);
       group.add(cssObject);
       return () => {
         group.remove(cssObject);
+        // Restore the original parent so reactjs does not get confused
+        parent?.appendChild(element);
       };
     }
   }, [disableVideo, participant, videoRef, groupRef]);
@@ -75,7 +59,7 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
       rotation-y={participantLocation.ry}
       scale={[2, 2, 1]}
     >
-      {disableAudio ? null : <RemoteParticipantAudioTracks participant={participant} />}
+      <RemoteParticipantAudioTracks participant={participant} />
       <RemoteParticipantDataTracks
         participant={participant}
         onLocationChange={onLocationChange}
