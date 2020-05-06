@@ -66,7 +66,7 @@ interface PortalProps {
 function Portal({ position, color, envMap }: PortalProps) {
   return (
     <mesh position={position}>
-      <cylinderBufferGeometry attach="geometry" args={[PORTAL_RADIUS, PORTAL_RADIUS, WORLD_SCALE, 16]} />
+      <cylinderBufferGeometry attach="geometry" args={[PORTAL_RADIUS, PORTAL_RADIUS, WORLD_SCALE / 16, 16]} />
       <meshStandardMaterial attach="material" color={color} metalness={1} roughness={0} envMap={envMap} />
     </mesh>
   );

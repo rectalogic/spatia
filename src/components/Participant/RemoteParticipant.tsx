@@ -59,6 +59,8 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
     if (element) {
       const group = groupRef.current;
       const cssObject = new CSS3DObject(element);
+      // Flip
+      cssObject.rotateY(Math.PI);
       group.add(cssObject);
       return () => {
         group.remove(cssObject);
@@ -69,8 +71,9 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
   return (
     <group
       ref={groupRef}
-      position={[participantLocation.x, WORLD_SCALE, participantLocation.z]}
+      position={[participantLocation.x, 2 * WORLD_SCALE, participantLocation.z]}
       rotation-y={participantLocation.ry}
+      scale={[2, 2, 1]}
     >
       {disableAudio ? null : <RemoteParticipantAudioTracks participant={participant} />}
       <RemoteParticipantDataTracks
