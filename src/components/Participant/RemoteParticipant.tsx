@@ -5,7 +5,7 @@ import { RemoteParticipantAudioTracks, RemoteParticipantDataTracks } from '../Pa
 import { RemoteParticipant as IRemoteParticipant } from 'twilio-video';
 import { ParticipantLocation, RequestLocationCallback } from './ParticipantLocation';
 import { useFrame } from 'react-three-fiber/css3d';
-import { VIDEO_MAX_DISTANCE, AUDIO_MAX_DISTANCE, WORLD_SCALE } from '../../Globals';
+import { WORLD_SCALE } from '../../Globals';
 
 export interface RemoteParticipantProps {
   participant: IRemoteParticipant;
