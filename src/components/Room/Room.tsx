@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import * as THREE from 'three';
 import { Canvas as CanvasGL } from 'react-three-fiber';
 import RemoteParticipant from '../Participant/RemoteParticipant';
 import LocalParticipant from '../Participant/LocalParticipant';
@@ -7,11 +8,15 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import World from '../World/World';
 import { Track } from 'twilio-video';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
-import { ParticipantLocation } from '../Participant/ParticipantLocation';
+import { ParticipantLocation, positionAroundPortal } from '../Participant/ParticipantLocation';
 import Controller from '../Controller/Controller';
 import Camera from '../Camera/Camera';
 import ForwardCanvasCSS from '../ForwardCanvasCSS/ForwardCanvasCSS';
 import { RemoteParticipantVideoTracks } from '../ParticipantTracks/ParticipantTracks';
+import { PORTALS, WORLD_SIZE, WORLD_SCALE } from '../../Globals';
+
+const MAXPOS = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
+const MINPOS = new THREE.Vector3(-WORLD_SIZE / 2, 0, -WORLD_SIZE / 2);
 
 export default function Room() {
   const {
@@ -19,11 +24,29 @@ export default function Room() {
   } = useVideoContext();
   const participants = useParticipants();
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
-  const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
+  const initialLocation = positionAroundPortal(PORTALS[0]['position']);
+  const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>(initialLocation);
   const videoRef = useRef<HTMLDivElement | null>(null);
+  const objectRef = useRef<THREE.Object3D>(
+    (() => {
+      const object = new THREE.Object3D();
+      object.position.set(initialLocation.x, 0, initialLocation.z);
+      object.rotation.set(0, initialLocation.ry, 0);
+      return object;
+    })()
+  );
+
+  function onUpdateLocation(acceleration: THREE.Vector2) {
+    const object = objectRef.current;
+    object.translateZ(-acceleration.y * (WORLD_SCALE / 10));
+    // Don't allow walking off the world
+    object.position.clamp(MINPOS, MAXPOS);
+    object.rotation.y += -acceleration.x / 100;
+    setLocalParticipantLocation({ x: object.position.x, z: object.position.z, ry: object.rotation.y });
+  }
 
   return (
-    <Controller setLocalParticipantLocation={setLocalParticipantLocation}>
+    <Controller onUpdateLocation={onUpdateLocation}>
       <CanvasGL>
         <World>
           <group

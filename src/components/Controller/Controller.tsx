@@ -1,12 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import * as THREE from 'three';
 import useAnimationFrame from '../../hooks/useAnimationFrame/useAnimationFrame';
-import { ParticipantLocation, positionAroundPortal } from '../Participant/ParticipantLocation';
-import { PORTALS, WORLD_SIZE, WORLD_SCALE } from '../../Globals';
 import { styled } from '@material-ui/core/styles';
-
-const MAXPOS = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
-const MINPOS = new THREE.Vector3(-WORLD_SIZE / 2, 0, -WORLD_SIZE / 2);
 
 const CanvasContainer = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -15,21 +10,11 @@ const CanvasContainer = styled('div')(({ theme }) => ({
 }));
 
 interface ControllerProps {
-  setLocalParticipantLocation: (localParticipantLocation: ParticipantLocation) => void;
+  onUpdateLocation: (acceleration: THREE.Vector2) => void;
   children: React.ReactNode;
 }
-export default function Controller({ setLocalParticipantLocation, children }: ControllerProps) {
-  const objectRef = useRef(new THREE.Object3D());
+export default function Controller({ onUpdateLocation, children }: ControllerProps) {
   const [acceleration, setAcceleration] = useState<THREE.Vector2 | null>(null);
-
-  useEffect(() => {
-    // Initially randomly position ourself around the portal perimeter
-    const location = positionAroundPortal(PORTALS[0]['position']);
-    const object = objectRef.current;
-    object.position.set(location.x, 0, location.z);
-    object.rotation.set(0, location.ry, 0);
-    setLocalParticipantLocation(location);
-  }, [setLocalParticipantLocation]);
 
   function computeAcceleration(e: React.MouseEvent) {
     const target = e.currentTarget as HTMLElement;
@@ -57,13 +42,7 @@ export default function Controller({ setLocalParticipantLocation, children }: Co
 
   useAnimationFrame(() => {
     if (acceleration) {
-      const object = objectRef.current;
-      object.translateZ(-acceleration.y * (WORLD_SCALE / 10));
-      // Don't allow walking off the world
-      object.position.clamp(MINPOS, MAXPOS);
-      object.rotation.y += -acceleration.x / 100;
-
-      setLocalParticipantLocation({ x: object.position.x, z: object.position.z, ry: object.rotation.y });
+      onUpdateLocation(acceleration);
     }
   }, acceleration != null);
 
