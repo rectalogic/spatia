@@ -24,25 +24,21 @@ export default function Room() {
   } = useVideoContext();
   const participants = useParticipants();
   const [locationRequested, setLocationRequested] = useState<Track.SID>('');
-  const initialLocation = positionAroundPortal(PORTALS[0]['position']);
-  const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>(initialLocation);
-  const videoRef = useRef<HTMLDivElement | null>(null);
-  const objectRef = useRef<THREE.Object3D>(
-    (() => {
-      const object = new THREE.Object3D();
-      object.position.set(initialLocation.x, 0, initialLocation.z);
-      object.rotation.set(0, initialLocation.ry, 0);
-      return object;
-    })()
+  const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>(
+    positionAroundPortal(PORTALS[0]['position'])
   );
+  const videoRef = useRef<HTMLDivElement | null>(null);
+  const localParticipantRef = useRef<THREE.Object3D>(null);
 
   function onUpdateLocation(acceleration: THREE.Vector2) {
-    const object = objectRef.current;
-    object.translateZ(-acceleration.y * (WORLD_SCALE / 10));
-    // Don't allow walking off the world
-    object.position.clamp(MINPOS, MAXPOS);
-    object.rotation.y += -acceleration.x / 100;
-    setLocalParticipantLocation({ x: object.position.x, z: object.position.z, ry: object.rotation.y });
+    const object = localParticipantRef.current;
+    if (object) {
+      object.rotation.y += -acceleration.x / 100;
+      object.translateZ(-acceleration.y * (WORLD_SCALE / 10));
+      // Don't allow walking off the world
+      object.position.clamp(MINPOS, MAXPOS);
+      setLocalParticipantLocation({ x: object.position.x, z: object.position.z, ry: object.rotation.y });
+    }
   }
 
   return (
@@ -60,6 +56,7 @@ export default function Room() {
 
       <ForwardCanvasCSS style={{ position: 'absolute', top: '0' }}>
         <group
+          ref={localParticipantRef}
           position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
           rotation-y={localParticipantLocation.ry}
         >
