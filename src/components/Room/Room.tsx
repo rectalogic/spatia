@@ -94,9 +94,11 @@ export default function Room() {
           // Stable parent div since we reparent in the CSS3D canvas
           <div key={participant.sid}>
             <div id={'video' + participant.sid}>
-              <ParticipantInfo participant={participant}>
-                <RemoteParticipantVideoTracks participant={participant} />
-              </ParticipantInfo>
+              <div style={{ transform: 'rotateY(180deg) scale(2, 2)' }}>
+                <ParticipantInfo participant={participant}>
+                  <RemoteParticipantVideoTracks participant={participant} />
+                </ParticipantInfo>
+              </div>
             </div>
           </div>
         ))}

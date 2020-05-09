@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'relative',
       display: 'flex',
       alignItems: 'center',
+      width: `${theme.sidebarWidth}px`,
       height: `${(theme.sidebarWidth * 9) / 16}px`,
       overflow: 'hidden',
       cursor: 'pointer',

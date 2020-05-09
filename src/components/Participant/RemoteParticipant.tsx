@@ -41,8 +41,6 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
       // CSS3D reparents, save the current parent
       const parent = element.parentElement;
       const cssObject = new CSS3DObject(element);
-      // Flip
-      cssObject.rotateY(Math.PI);
       group.add(cssObject);
       return () => {
         group.remove(cssObject);
@@ -57,7 +55,6 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
       ref={groupRef}
       position={[participantLocation.x, 2 * WORLD_SCALE, participantLocation.z]}
       rotation-y={participantLocation.ry}
-      scale={[2, 2, 1]}
     >
       <RemoteParticipantAudioTracks participant={participant} />
       <RemoteParticipantDataTracks
