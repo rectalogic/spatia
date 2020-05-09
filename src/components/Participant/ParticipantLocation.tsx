@@ -7,8 +7,8 @@ export interface ParticipantLocation {
   ry: number;
 }
 
-export type LocationCallback = (location: ParticipantLocation) => void;
-export type RequestLocationCallback = (sid: Track.SID) => void;
+export type LocationChangeCallback = (location: ParticipantLocation) => void;
+export type RequestLocationBroadcastCallback = (sid: Track.SID) => void;
 
 export function positionAroundPortal(position: [number, number, number]) {
   const angle = 2 * Math.PI * Math.random();

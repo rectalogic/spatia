@@ -6,19 +6,19 @@ import { ParticipantLocation } from './ParticipantLocation';
 export interface LocalParticipantProps {
   participant: ILocalParticipant;
   participantLocation: ParticipantLocation;
-  locationRequested: Track.SID;
+  triggerLocationBroadcast: Track.SID;
 }
 
 export default function LocalParticipant({
   participant,
   participantLocation,
-  locationRequested,
+  triggerLocationBroadcast,
 }: LocalParticipantProps) {
   return (
     <LocalParticipantTracks
       participant={participant}
       location={participantLocation}
-      locationRequested={locationRequested}
+      triggerLocationBroadcast={triggerLocationBroadcast}
     />
   );
 }

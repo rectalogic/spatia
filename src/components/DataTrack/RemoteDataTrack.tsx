@@ -1,20 +1,20 @@
 import { useEffect } from 'react';
 import { RemoteDataTrack as IRemoteDataTrack } from 'twilio-video';
-import { LocationCallback, RequestLocationCallback } from '../Participant/ParticipantLocation';
+import { LocationChangeCallback, RequestLocationBroadcastCallback } from '../Participant/ParticipantLocation';
 
 interface DataTrackProps {
   track: IRemoteDataTrack;
-  onLocationChange: LocationCallback;
-  requestLocation: RequestLocationCallback;
+  onLocationChange: LocationChangeCallback;
+  requestLocationBroadcast?: RequestLocationBroadcastCallback;
 }
 
-export default function RemoteDataTrack({ track, onLocationChange, requestLocation }: DataTrackProps) {
+export default function RemoteDataTrack({ track, onLocationChange, requestLocationBroadcast }: DataTrackProps) {
   useEffect(() => {
     function handleMessage(buffer: ArrayBuffer) {
       const locationBuffer = new Float64Array(buffer);
       // Length 1 buffer is a special flag to trigger us to resend our location
       if (locationBuffer.length === 1) {
-        requestLocation(track.sid);
+        requestLocationBroadcast && requestLocationBroadcast(track.sid);
         return;
       }
       const location = { x: locationBuffer[0], z: locationBuffer[1], ry: locationBuffer[2] };
@@ -24,6 +24,6 @@ export default function RemoteDataTrack({ track, onLocationChange, requestLocati
     return () => {
       track.off('message', handleMessage);
     };
-  }, [track, onLocationChange, requestLocation]);
+  }, [track, onLocationChange, requestLocationBroadcast]);
   return null;
 }

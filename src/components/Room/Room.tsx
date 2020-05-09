@@ -23,7 +23,7 @@ export default function Room() {
     room: { localParticipant },
   } = useVideoContext();
   const participants = useParticipants();
-  const [locationRequested, setLocationRequested] = useState<Track.SID>('');
+  const [currentLocationBroadcastRequested, setCurrentLocationBroadcastRequested] = useState<Track.SID>('');
   const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>(
     positionAroundPortal(PORTALS[0]['position'])
   );
@@ -68,7 +68,7 @@ export default function Room() {
               key={participant.sid}
               participant={participant}
               videoRef={videoRef}
-              requestLocation={setLocationRequested}
+              requestLocationBroadcast={setCurrentLocationBroadcastRequested}
             />
           );
         })}
@@ -80,7 +80,7 @@ export default function Room() {
             <LocalParticipant
               participant={localParticipant}
               participantLocation={localParticipantLocation}
-              locationRequested={locationRequested}
+              triggerLocationBroadcast={currentLocationBroadcastRequested}
             />
           </ParticipantInfo>
         </div>

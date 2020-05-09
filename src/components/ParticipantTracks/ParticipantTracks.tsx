@@ -15,7 +15,11 @@ import {
   RemoteDataPublication,
 } from '../Publication/Publication';
 import usePublications from '../../hooks/usePublications/usePublications';
-import { LocationCallback, ParticipantLocation, RequestLocationCallback } from '../Participant/ParticipantLocation';
+import {
+  LocationChangeCallback,
+  ParticipantLocation,
+  RequestLocationBroadcastCallback,
+} from '../Participant/ParticipantLocation';
 
 /*
  *  The object model for the Room object (found here: https://www.twilio.com/docs/video/migrating-1x-2x#object-model) shows
@@ -28,10 +32,14 @@ import { LocationCallback, ParticipantLocation, RequestLocationCallback } from '
 interface LocalParticipantTracksProps {
   participant: LocalParticipant;
   location: ParticipantLocation;
-  locationRequested: Track.SID;
+  triggerLocationBroadcast: Track.SID;
 }
 
-export function LocalParticipantTracks({ participant, location, locationRequested }: LocalParticipantTracksProps) {
+export function LocalParticipantTracks({
+  participant,
+  location,
+  triggerLocationBroadcast,
+}: LocalParticipantTracksProps) {
   const publications = usePublications(participant);
   return (
     <>
@@ -41,7 +49,7 @@ export function LocalParticipantTracks({ participant, location, locationRequeste
           publication={publication as LocalTrackPublication}
           participant={participant}
           location={location}
-          locationRequested={locationRequested}
+          triggerLocationBroadcast={triggerLocationBroadcast}
         />
       ))}
     </>
@@ -82,13 +90,13 @@ export function RemoteParticipantAudioTracks({ participant }: RemoteParticipantA
 
 interface RemoteParticipantDataTracksProps {
   participant: RemoteParticipant;
-  onLocationChange: LocationCallback;
-  requestLocation: RequestLocationCallback;
+  onLocationChange: LocationChangeCallback;
+  requestLocationBroadcast?: RequestLocationBroadcastCallback;
 }
 export function RemoteParticipantDataTracks({
   participant,
   onLocationChange,
-  requestLocation,
+  requestLocationBroadcast,
 }: RemoteParticipantDataTracksProps) {
   const publications = usePublications(participant);
   return (
@@ -99,7 +107,7 @@ export function RemoteParticipantDataTracks({
             key={publication.kind}
             publication={publication as RemoteDataTrackPublication}
             onLocationChange={onLocationChange}
-            requestLocation={requestLocation}
+            requestLocationBroadcast={requestLocationBroadcast}
           />
         ) : null
       )}

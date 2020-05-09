@@ -3,17 +3,17 @@ import * as THREE from 'three';
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
 import { RemoteParticipantAudioTracks, RemoteParticipantDataTracks } from '../ParticipantTracks/ParticipantTracks';
 import { RemoteParticipant as IRemoteParticipant } from 'twilio-video';
-import { ParticipantLocation, RequestLocationCallback } from './ParticipantLocation';
+import { ParticipantLocation, RequestLocationBroadcastCallback } from './ParticipantLocation';
 import { useFrame } from 'react-three-fiber/css3d';
 import { WORLD_SCALE } from '../../Globals';
 
 export interface RemoteParticipantProps {
   participant: IRemoteParticipant;
   videoRef: React.MutableRefObject<HTMLElement | null>;
-  requestLocation: RequestLocationCallback;
+  requestLocationBroadcast: RequestLocationBroadcastCallback;
 }
 
-export default function RemoteParticipant({ participant, videoRef, requestLocation }: RemoteParticipantProps) {
+export default function RemoteParticipant({ participant, videoRef, requestLocationBroadcast }: RemoteParticipantProps) {
   const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
   const [disableVideo, setDisableVideo] = useState(false);
   const groupRef = useRef<THREE.Object3D>(null!);
@@ -60,7 +60,7 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
       <RemoteParticipantDataTracks
         participant={participant}
         onLocationChange={onLocationChange}
-        requestLocation={requestLocation}
+        requestLocationBroadcast={requestLocationBroadcast}
       />
     </group>
   );

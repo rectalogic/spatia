@@ -4,7 +4,11 @@ import RemoteAudioTrack3D from '../AudioTrack/AudioTrack';
 import VideoTrack from '../VideoTrack/VideoTrack';
 import LocalDataTrack from '../DataTrack/LocalDataTrack';
 import RemoteDataTrack from '../DataTrack/RemoteDataTrack';
-import { ParticipantLocation, LocationCallback, RequestLocationCallback } from '../Participant/ParticipantLocation';
+import {
+  ParticipantLocation,
+  LocationChangeCallback,
+  RequestLocationBroadcastCallback,
+} from '../Participant/ParticipantLocation';
 
 import { IVideoTrack } from '../../types';
 import {
@@ -23,10 +27,10 @@ interface LocalPublicationProps {
   publication: LocalTrackPublication;
   participant: LocalParticipant;
   location: ParticipantLocation;
-  locationRequested: Track.SID;
+  triggerLocationBroadcast: Track.SID;
 }
 
-export function LocalPublication({ publication, location, locationRequested }: LocalPublicationProps) {
+export function LocalPublication({ publication, location, triggerLocationBroadcast }: LocalPublicationProps) {
   const track = useTrack(publication);
 
   if (!track) return null;
@@ -38,7 +42,11 @@ export function LocalPublication({ publication, location, locationRequested }: L
       return null;
     case 'data':
       return (
-        <LocalDataTrack track={track as ILocalDataTrack} location={location} locationRequested={locationRequested} />
+        <LocalDataTrack
+          track={track as ILocalDataTrack}
+          location={location}
+          triggerLocationBroadcast={triggerLocationBroadcast}
+        />
       );
     default:
       return null;
@@ -65,10 +73,14 @@ export function RemoteAudioPublication({ publication }: RemoteAudioPublicationPr
 
 interface RemoteDataPublicationProps {
   publication: RemoteDataTrackPublication;
-  onLocationChange: LocationCallback;
-  requestLocation: RequestLocationCallback;
+  onLocationChange: LocationChangeCallback;
+  requestLocationBroadcast?: RequestLocationBroadcastCallback;
 }
-export function RemoteDataPublication({ publication, onLocationChange, requestLocation }: RemoteDataPublicationProps) {
+export function RemoteDataPublication({
+  publication,
+  onLocationChange,
+  requestLocationBroadcast,
+}: RemoteDataPublicationProps) {
   const track = useTrack(publication);
 
   if (!track) return null;
@@ -76,7 +88,7 @@ export function RemoteDataPublication({ publication, onLocationChange, requestLo
     <RemoteDataTrack
       track={track as IRemoteDataTrack}
       onLocationChange={onLocationChange}
-      requestLocation={requestLocation}
+      requestLocationBroadcast={requestLocationBroadcast}
     />
   );
 }
