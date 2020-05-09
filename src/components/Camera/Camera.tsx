@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import * as THREE from 'three';
 import { useThree as useThreeGL, useUpdate as useUpdateGL } from 'react-three-fiber';
 import { useThree as useThreeCSS, useUpdate as useUpdateCSS } from 'react-three-fiber/css3d';
-import { CAMERA_FOV, WORLD_SIZE, WORLD_SCALE } from '../../Globals';
+import { CAMERA_FOV, WORLD_SIZE, WORLD_SCALE, RenderType } from '../../Globals';
 
 const RenderInfo = {
   css3d: {
@@ -16,7 +16,7 @@ const RenderInfo = {
 };
 
 interface CameraProps {
-  renderer: 'css3d' | 'webgl';
+  renderer: RenderType;
   hasListener?: boolean;
 }
 export default function Camera({ renderer, hasListener }: CameraProps) {

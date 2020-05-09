@@ -7,6 +7,8 @@ export const VIDEO_MAX_DISTANCE = 15 * WORLD_SCALE;
 export const WORLD_SIZE = 128 * WORLD_SCALE;
 export const PORTAL_RADIUS = WORLD_SCALE;
 
+export type RenderType = 'css3d' | 'webgl';
+
 interface PortalProps {
   position: [number, number, number];
   color: number;

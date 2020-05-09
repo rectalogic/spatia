@@ -11,7 +11,7 @@ import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
 import { ParticipantLocation, positionAroundPortal } from '../Participant/ParticipantLocation';
 import Controller from '../Controller/Controller';
 import Camera from '../Camera/Camera';
-import ForwardCanvasCSS from '../ForwardCanvasCSS/ForwardCanvasCSS';
+import ForwardCanvas from '../ForwardCanvas/ForwardCanvas';
 import { RemoteParticipantVideoTracks } from '../ParticipantTracks/ParticipantTracks';
 import { PORTALS, WORLD_SIZE, WORLD_SCALE } from '../../Globals';
 
@@ -54,7 +54,7 @@ export default function Room() {
         </World>
       </CanvasGL>
 
-      <ForwardCanvasCSS style={{ position: 'absolute', top: '0' }}>
+      <ForwardCanvas renderer="css3d" style={{ position: 'absolute', top: '0' }}>
         <group
           ref={localParticipantRef}
           position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
@@ -72,7 +72,7 @@ export default function Room() {
             />
           );
         })}
-      </ForwardCanvasCSS>
+      </ForwardCanvas>
 
       <div style={{ position: 'absolute', top: '0', left: '50%' }}>
         <div style={{ position: 'relative', left: '-50%' }}>
