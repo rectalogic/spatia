@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import * as THREE from 'three';
-import { Canvas as CanvasGL } from 'react-three-fiber';
 import RemoteParticipant from '../Participant/RemoteParticipant';
 import LocalParticipant from '../Participant/LocalParticipant';
 import useParticipants from '../../hooks/useParticipants/useParticipants';
@@ -43,7 +42,7 @@ export default function Room() {
 
   return (
     <Controller onUpdateLocation={onUpdateLocation}>
-      <CanvasGL>
+      <ForwardCanvas renderer="webgl" invalidateFrameloop={true}>
         <World>
           <group
             position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
@@ -52,9 +51,9 @@ export default function Room() {
             <Camera renderer="webgl" />
           </group>
         </World>
-      </CanvasGL>
+      </ForwardCanvas>
 
-      <ForwardCanvas renderer="css3d" style={{ position: 'absolute', top: '0' }}>
+      <ForwardCanvas renderer="css3d" invalidateFrameloop={true} style={{ position: 'absolute', top: '0' }}>
         <group
           ref={localParticipantRef}
           position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
