@@ -1,25 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
-import { RemoteParticipantAudioTracks, RemoteParticipantDataTracks } from '../ParticipantTracks/ParticipantTracks';
 import { RemoteParticipant as IRemoteParticipant } from 'twilio-video';
-import { ParticipantLocation, RequestLocationBroadcastCallback } from './ParticipantLocation';
+import { ParticipantLocation } from './ParticipantLocation';
 import { useThree } from 'react-three-fiber/css3d';
-import { WORLD_SCALE } from '../../Globals';
+import { WORLD_SCALE, AUDIO_REF_DISTANCE } from '../../Globals';
 
 export interface RemoteParticipantProps {
   participant: IRemoteParticipant;
-  videoRef: React.MutableRefObject<HTMLElement | null>;
-  requestLocationBroadcast: RequestLocationBroadcastCallback;
+  participantLocation: ParticipantLocation;
+  mediaRef: React.MutableRefObject<HTMLElement | null>;
+  audioListenerRef: React.MutableRefObject<THREE.AudioListener | null>;
 }
 
-export default function RemoteParticipant({ participant, videoRef, requestLocationBroadcast }: RemoteParticipantProps) {
-  const [participantLocation, setParticipantLocation] = useState<ParticipantLocation>({ x: 0, z: 0, ry: 0 });
+export default function RemoteParticipant({
+  participant,
+  participantLocation,
+  mediaRef,
+  audioListenerRef,
+}: RemoteParticipantProps) {
   const [disableVideo, setDisableVideo] = useState(false);
   const { camera } = useThree();
   const groupRef = useRef<THREE.Object3D>(null!);
-
-  const onLocationChange = (location: ParticipantLocation) => setParticipantLocation(location);
 
   useEffect(() => {
     function isObjectBehindCamera() {
@@ -34,7 +36,7 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
   }, [camera, participantLocation]);
 
   useEffect(() => {
-    if (disableVideo || videoRef.current === null) return;
+    if (disableVideo || !mediaRef.current) return;
     const element = document.getElementById('video' + participant.sid);
     if (element) {
       const group = groupRef.current;
@@ -48,20 +50,34 @@ export default function RemoteParticipant({ participant, videoRef, requestLocati
         parent?.appendChild(element);
       };
     }
-  }, [disableVideo, participant, videoRef, groupRef]);
+  }, [disableVideo, participant, mediaRef, groupRef]);
+
+  useEffect(() => {
+    if (!mediaRef.current || !audioListenerRef.current) return;
+    const audioElements = [...mediaRef.current.getElementsByTagName('audio')];
+    if (audioElements.length) {
+      const listener = audioListenerRef.current;
+      const group = groupRef.current;
+      const sounds = audioElements.map(audio => {
+        const sound = new THREE.PositionalAudio(listener);
+        sound.setRefDistance(AUDIO_REF_DISTANCE);
+        sound.setMediaElementSource(audio);
+        group.add(sound);
+        return sound;
+      });
+      return () => {
+        for (const sound of sounds) {
+          group.remove(sound);
+        }
+      };
+    }
+  }, [camera, audioListenerRef, mediaRef]);
 
   return (
     <group
       ref={groupRef}
       position={[participantLocation.x, WORLD_SCALE, participantLocation.z]}
       rotation-y={participantLocation.ry}
-    >
-      <RemoteParticipantAudioTracks participant={participant} />
-      <RemoteParticipantDataTracks
-        participant={participant}
-        onLocationChange={onLocationChange}
-        requestLocationBroadcast={requestLocationBroadcast}
-      />
-    </group>
+    />
   );
 }

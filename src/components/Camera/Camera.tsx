@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, forwardRef } from 'react';
 import * as THREE from 'three';
 import { useThree as useThreeGL, useUpdate as useUpdateGL } from 'react-three-fiber';
 import { useThree as useThreeCSS, useUpdate as useUpdateCSS } from 'react-three-fiber/css3d';
@@ -19,9 +19,9 @@ interface CameraProps {
   renderer: RenderType;
   hasListener?: boolean;
 }
-export default function Camera({ renderer, hasListener }: CameraProps) {
+const Camera = forwardRef<THREE.AudioListener, CameraProps>(({ renderer, hasListener }, ref) => {
   const { setDefaultCamera, size } = RenderInfo[renderer]['useThree']();
-  const ref = RenderInfo[renderer]['useUpdate']<THREE.PerspectiveCamera>(
+  const cameraRef = RenderInfo[renderer]['useUpdate']<THREE.PerspectiveCamera>(
     cam => {
       cam.aspect = size.width / size.height;
       cam.updateProjectionMatrix();
@@ -30,19 +30,21 @@ export default function Camera({ renderer, hasListener }: CameraProps) {
   );
 
   useEffect(() => {
-    setDefaultCamera(ref.current);
-  }, [ref, setDefaultCamera]);
+    setDefaultCamera(cameraRef.current);
+  }, [cameraRef, setDefaultCamera]);
 
   return (
     <perspectiveCamera
-      ref={ref}
+      ref={cameraRef}
       fov={CAMERA_FOV}
       near={0.1 * WORLD_SCALE}
       far={WORLD_SIZE}
       rotation-x={-Math.PI / 24}
       position={[0, 2 * WORLD_SCALE, 0]}
     >
-      {hasListener ? <audioListener name="audioListener" /> : null}
+      {hasListener ? <audioListener ref={ref} /> : null}
     </perspectiveCamera>
   );
-}
+});
+
+export default Camera;

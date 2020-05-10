@@ -1,17 +1,22 @@
 import React, { useState, useRef } from 'react';
 import * as THREE from 'three';
+import { Canvas as CanvasGL } from 'react-three-fiber';
+import { Canvas as CanvasCSS } from 'react-three-fiber/css3d';
 import RemoteParticipant from '../Participant/RemoteParticipant';
 import LocalParticipant from '../Participant/LocalParticipant';
 import useParticipants from '../../hooks/useParticipants/useParticipants';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
-import World from '../World/World';
-import { Track } from 'twilio-video';
+import World, { ParticipantShadowCaster } from '../World/World';
+import { Track, Participant } from 'twilio-video';
 import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
 import { ParticipantLocation, positionAroundPortal } from '../Participant/ParticipantLocation';
 import Controller from '../Controller/Controller';
 import Camera from '../Camera/Camera';
-import ForwardCanvas from '../ForwardCanvas/ForwardCanvas';
-import { RemoteParticipantVideoTracks } from '../ParticipantTracks/ParticipantTracks';
+import {
+  RemoteParticipantVideoTracks,
+  RemoteParticipantAudioTracks,
+  RemoteParticipantDataTracks,
+} from '../ParticipantTracks/ParticipantTracks';
 import { PORTALS, WORLD_SIZE, WORLD_SCALE } from '../../Globals';
 
 const MAXPOS = new THREE.Vector3(WORLD_SIZE / 2, 0, WORLD_SIZE / 2);
@@ -26,10 +31,14 @@ export default function Room() {
   const [localParticipantLocation, setLocalParticipantLocation] = useState<ParticipantLocation>(
     positionAroundPortal(PORTALS[0]['position'])
   );
-  const videoRef = useRef<HTMLDivElement | null>(null);
+  const [remoteParticipantLocations, setRemoteParticipantLocations] = useState<
+    Map<Participant.SID, ParticipantLocation>
+  >(new Map<Participant.SID, ParticipantLocation>());
+  const mediaRef = useRef<HTMLDivElement | null>(null);
   const localParticipantRef = useRef<THREE.Object3D>(null);
+  const audioListenerRef = useRef<THREE.AudioListener>(null);
 
-  function onUpdateLocation(acceleration: THREE.Vector2) {
+  function onComputeLocalParticipantLocation(acceleration: THREE.Vector2) {
     const object = localParticipantRef.current;
     if (object) {
       object.rotation.y += -acceleration.x / 100;
@@ -40,9 +49,14 @@ export default function Room() {
     }
   }
 
+  function onUpdateRemoteParticipantLocations(sid: Participant.SID, location: ParticipantLocation) {
+    //XXX this doesn't remove old sids
+    setRemoteParticipantLocations(locations => new Map(locations.set(sid, location)));
+  }
+
   return (
-    <Controller onUpdateLocation={onUpdateLocation}>
-      <ForwardCanvas renderer="webgl" invalidateFrameloop={true}>
+    <Controller onUpdateLocation={onComputeLocalParticipantLocation}>
+      <CanvasGL invalidateFrameloop={true} shadowMap>
         <World>
           <group
             position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
@@ -50,28 +64,34 @@ export default function Room() {
           >
             <Camera renderer="webgl" />
           </group>
+          {participants.map(participant => {
+            const location = remoteParticipantLocations.get(participant.sid);
+            return <ParticipantShadowCaster key={participant.sid} location={location || { x: 0, z: 0, ry: 0 }} />;
+          })}
         </World>
-      </ForwardCanvas>
+      </CanvasGL>
 
-      <ForwardCanvas renderer="css3d" invalidateFrameloop={true} style={{ position: 'absolute', top: '0' }}>
+      <CanvasCSS invalidateFrameloop={true} style={{ position: 'absolute', top: '0' }}>
         <group
           ref={localParticipantRef}
           position={[localParticipantLocation.x, 0, localParticipantLocation.z]}
           rotation-y={localParticipantLocation.ry}
         >
-          <Camera renderer="css3d" hasListener />
+          <Camera renderer="css3d" ref={audioListenerRef} hasListener />
         </group>
         {participants.map(participant => {
+          const location = remoteParticipantLocations.get(participant.sid);
           return (
             <RemoteParticipant
               key={participant.sid}
               participant={participant}
-              videoRef={videoRef}
-              requestLocationBroadcast={setCurrentLocationBroadcastRequested}
+              participantLocation={location || { x: 0, z: 0, ry: 0 }}
+              audioListenerRef={audioListenerRef}
+              mediaRef={mediaRef}
             />
           );
         })}
-      </ForwardCanvas>
+      </CanvasCSS>
 
       <div style={{ position: 'absolute', top: '0', left: '50%' }}>
         <div style={{ position: 'relative', left: '-50%' }}>
@@ -85,17 +105,25 @@ export default function Room() {
         </div>
       </div>
 
-      <div ref={videoRef}>
+      <div ref={mediaRef}>
         {participants.map(participant => (
-          // Stable parent div since we reparent in the CSS3D canvas
+          // Stable parent div of the video 'id' div, since we reparent in the CSS3D canvas
           <div key={participant.sid}>
-            <div id={'video' + participant.sid}>
-              <div style={{ transform: 'rotateY(180deg) scale(2, 2)' }}>
-                <ParticipantInfo participant={participant}>
-                  <RemoteParticipantVideoTracks participant={participant} />
-                </ParticipantInfo>
+            <div>
+              <div id={'video' + participant.sid}>
+                <div style={{ transform: 'rotateY(180deg) scale(2, 2)' }}>
+                  <ParticipantInfo participant={participant}>
+                    <RemoteParticipantVideoTracks participant={participant} />
+                  </ParticipantInfo>
+                </div>
               </div>
             </div>
+            <RemoteParticipantAudioTracks participant={participant} />
+            <RemoteParticipantDataTracks
+              participant={participant}
+              onLocationChange={location => onUpdateRemoteParticipantLocations(participant.sid, location)}
+              requestLocationBroadcast={setCurrentLocationBroadcastRequested}
+            />
           </div>
         ))}
       </div>

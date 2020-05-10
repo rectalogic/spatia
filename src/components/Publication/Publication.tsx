@@ -1,6 +1,6 @@
 import React from 'react';
 import useTrack from '../../hooks/useTrack/useTrack';
-import RemoteAudioTrack3D from '../AudioTrack/AudioTrack';
+import RemoteAudioTrack from '../AudioTrack/AudioTrack';
 import VideoTrack from '../VideoTrack/VideoTrack';
 import LocalDataTrack from '../DataTrack/LocalDataTrack';
 import RemoteDataTrack from '../DataTrack/RemoteDataTrack';
@@ -68,7 +68,7 @@ interface RemoteAudioPublicationProps {
 export function RemoteAudioPublication({ publication }: RemoteAudioPublicationProps) {
   const track = useTrack(publication);
   if (!track) return null;
-  return <RemoteAudioTrack3D track={track as IRemoteAudioTrack} />;
+  return <RemoteAudioTrack track={track as IRemoteAudioTrack} />;
 }
 
 interface RemoteDataPublicationProps {

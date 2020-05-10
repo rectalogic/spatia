@@ -1,34 +1,27 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { useThree } from 'react-three-fiber/css3d';
-import * as THREE from 'three';
+import React, { useEffect, useRef } from 'react';
 import { RemoteAudioTrack as IRemoteAudioTrack } from 'twilio-video';
-import { AUDIO_REF_DISTANCE } from '../../Globals';
 import { useAppState } from '../../state';
 
-interface RemoteAudioTrack3DProps {
+interface RemoteAudioTrackProps {
   track: IRemoteAudioTrack;
 }
 
-export default function RemoteAudioTrack3D({ track }: RemoteAudioTrack3DProps) {
-  const ref = useRef<THREE.PositionalAudio>(null);
-  const { camera } = useThree();
+export default function RemoteAudioTrack({ track }: RemoteAudioTrackProps) {
   const { activeSinkId } = useAppState();
-  const audio = useMemo(() => document.createElement('audio'), []);
+  const audioRef = useRef<HTMLAudioElement>(null!);
 
   useEffect(() => {
+    const audio = audioRef.current;
     track.attach(audio);
-    const sound = ref.current!;
-    sound.setRefDistance(AUDIO_REF_DISTANCE);
-    sound.setMediaElementSource(audio);
     return () => {
       track.detach(audio);
     };
-  }, [ref, track, audio]);
+  }, [audioRef, track]);
 
   useEffect(() => {
+    const audio = audioRef.current;
     audio.setSinkId?.(activeSinkId);
-  }, [audio, activeSinkId]);
+  }, [audioRef, activeSinkId]);
 
-  const listener = camera.getObjectByName('audioListener') as THREE.AudioListener;
-  return <positionalAudio ref={ref} args={[listener]} />;
+  return <audio ref={audioRef} />;
 }
