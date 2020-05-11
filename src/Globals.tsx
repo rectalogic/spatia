@@ -2,9 +2,7 @@ export const WORLD_SCALE = 256; // 256(9/16)=144
 export const VIDEO_WIDTH = WORLD_SCALE;
 export const CAMERA_FOV = 75;
 export const AUDIO_REF_DISTANCE = WORLD_SCALE;
-export const AUDIO_MAX_DISTANCE = 20 * WORLD_SCALE;
-export const VIDEO_MAX_DISTANCE = 15 * WORLD_SCALE;
-export const WORLD_SIZE = 128 * WORLD_SCALE;
+export const WORLD_SIZE = 512 * WORLD_SCALE;
 export const PORTAL_RADIUS = WORLD_SCALE;
 
 export type RenderType = 'css3d' | 'webgl';

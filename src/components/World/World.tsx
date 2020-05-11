@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useThree, ReactThreeFiber } from 'react-three-fiber';
+import { useThree, ReactThreeFiber, invalidate } from 'react-three-fiber';
 import * as THREE from 'three';
 import { WORLD_SIZE, PORTAL_RADIUS, PORTALS, WORLD_SCALE, VIDEO_WIDTH } from '../../Globals';
 import pxCube from './Textures/SkyBox/px.png';
@@ -36,6 +36,7 @@ function Ground({ envMap }: GroundProps) {
     setHeightMap(loadTexture(heightStone));
     setNormalMap(loadTexture(normalStone));
     setRoughnessMap(loadTexture(roughnessStone));
+    invalidate();
   }, []);
 
   return (
@@ -88,7 +89,12 @@ export default function World({ children }: WorldProps) {
   const [cubeTexture, setCubeTexture] = useState<THREE.CubeTexture | null>(null);
   useEffect(() => {
     const urls = [pxCube, nxCube, pyCube, nyCube, pzCube, nzCube];
-    setCubeTexture(new THREE.CubeTextureLoader().load(urls, texture => (scene.background = texture)));
+    setCubeTexture(
+      new THREE.CubeTextureLoader().load(urls, texture => {
+        scene.background = texture;
+        invalidate();
+      })
+    );
   }, [scene]);
 
   return (
