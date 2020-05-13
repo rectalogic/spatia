@@ -4,19 +4,22 @@ import { useAppState } from '../../state';
 
 interface RemoteAudioTrackProps {
   track: IRemoteAudioTrack;
+  attachAudio: boolean;
 }
 
-export default function RemoteAudioTrack({ track }: RemoteAudioTrackProps) {
+export default function RemoteAudioTrack({ track, attachAudio }: RemoteAudioTrackProps) {
   const { activeSinkId } = useAppState();
   const audioRef = useRef<HTMLAudioElement>(null!);
 
   useEffect(() => {
     const audio = audioRef.current;
-    track.attach(audio);
-    return () => {
-      track.detach(audio);
-    };
-  }, [audioRef, track]);
+    if (attachAudio) {
+      track.attach(audio);
+      return () => {
+        track.detach(audio);
+      };
+    }
+  }, [attachAudio, audioRef, track]);
 
   useEffect(() => {
     const audio = audioRef.current;

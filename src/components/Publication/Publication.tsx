@@ -64,11 +64,12 @@ export function RemoteVideoPublication({ publication }: RemoteVideoPublicationPr
 
 interface RemoteAudioPublicationProps {
   publication: RemoteAudioTrackPublication;
+  attachAudio: boolean;
 }
-export function RemoteAudioPublication({ publication }: RemoteAudioPublicationProps) {
+export function RemoteAudioPublication({ publication, attachAudio }: RemoteAudioPublicationProps) {
   const track = useTrack(publication);
   if (!track) return null;
-  return <RemoteAudioTrack track={track as IRemoteAudioTrack} />;
+  return <RemoteAudioTrack track={track as IRemoteAudioTrack} attachAudio={attachAudio} />;
 }
 
 interface RemoteDataPublicationProps {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { Canvas as CanvasGL } from 'react-three-fiber';
 import { Canvas as CanvasCSS } from 'react-three-fiber/css3d';
@@ -34,6 +34,9 @@ export default function Room() {
   const [remoteParticipantLocations, setRemoteParticipantLocations] = useState<
     Map<Participant.SID, ParticipantLocation>
   >(new Map<Participant.SID, ParticipantLocation>());
+  const [attachParticipantAudio, setAttachParticipantAudio] = useState<Map<Participant.SID, boolean>>(
+    new Map<Participant.SID, boolean>()
+  );
   const mediaRef = useRef<HTMLDivElement | null>(null);
   const localParticipantRef = useRef<THREE.Object3D>(null);
   const audioListenerRef = useRef<THREE.AudioListener>(null);
@@ -49,10 +52,15 @@ export default function Room() {
     }
   }
 
-  function onUpdateRemoteParticipantLocations(sid: Participant.SID, location: ParticipantLocation) {
+  const onUpdateRemoteParticipantLocations = useCallback((sid: Participant.SID, location: ParticipantLocation) => {
     //XXX this doesn't remove old sids
     setRemoteParticipantLocations(locations => new Map(locations.set(sid, location)));
-  }
+  }, []);
+
+  const onUpdateRemoteParticipantAttachAudio = useCallback((sid: Participant.SID, attach: boolean) => {
+    //XXX this doesn't remove old sids
+    setAttachParticipantAudio(attachments => new Map(attachments.set(sid, attach)));
+  }, []);
 
   return (
     <Controller onUpdateLocation={onComputeLocalParticipantLocation}>
@@ -88,6 +96,7 @@ export default function Room() {
               participantLocation={location || { x: 0, z: 0, ry: 0 }}
               audioListenerRef={audioListenerRef}
               mediaRef={mediaRef}
+              setAttachAudio={onUpdateRemoteParticipantAttachAudio}
             />
           );
         })}
@@ -118,7 +127,12 @@ export default function Room() {
                 </div>
               </div>
             </div>
-            <RemoteParticipantAudioTracks participant={participant} />
+            <div id={'audio' + participant.sid}>
+              <RemoteParticipantAudioTracks
+                participant={participant}
+                attachAudio={attachParticipantAudio.get(participant.sid) || false}
+              />
+            </div>
             <RemoteParticipantDataTracks
               participant={participant}
               onLocationChange={location => onUpdateRemoteParticipantLocations(participant.sid, location)}

@@ -74,14 +74,19 @@ export function RemoteParticipantVideoTracks({ participant }: RemoteParticipantV
 
 interface RemoteParticipantAudioTracksProps {
   participant: RemoteParticipant;
+  attachAudio: boolean;
 }
-export function RemoteParticipantAudioTracks({ participant }: RemoteParticipantAudioTracksProps) {
+export function RemoteParticipantAudioTracks({ participant, attachAudio }: RemoteParticipantAudioTracksProps) {
   const publications = usePublications(participant);
   return (
     <>
       {publications.map(publication =>
         publication.kind === 'audio' ? (
-          <RemoteAudioPublication key={publication.kind} publication={publication as RemoteAudioTrackPublication} />
+          <RemoteAudioPublication
+            key={publication.kind}
+            publication={publication as RemoteAudioTrackPublication}
+            attachAudio={attachAudio}
+          />
         ) : null
       )}
     </>

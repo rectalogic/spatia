@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer';
-import { RemoteParticipant as IRemoteParticipant } from 'twilio-video';
+import { RemoteParticipant as IRemoteParticipant, Participant } from 'twilio-video';
 import { ParticipantLocation } from './ParticipantLocation';
 import { useThree } from 'react-three-fiber/css3d';
 import { WORLD_SCALE, AUDIO_REF_DISTANCE } from '../../Globals';
@@ -11,6 +11,7 @@ export interface RemoteParticipantProps {
   participantLocation: ParticipantLocation;
   mediaRef: React.MutableRefObject<HTMLElement | null>;
   audioListenerRef: React.MutableRefObject<THREE.AudioListener | null>;
+  setAttachAudio: (sid: Participant.SID, attach: boolean) => void;
 }
 
 export default function RemoteParticipant({
@@ -18,6 +19,7 @@ export default function RemoteParticipant({
   participantLocation,
   mediaRef,
   audioListenerRef,
+  setAttachAudio,
 }: RemoteParticipantProps) {
   const [disableVideo, setDisableVideo] = useState(false);
   const { camera } = useThree();
@@ -54,8 +56,9 @@ export default function RemoteParticipant({
 
   useEffect(() => {
     if (!mediaRef.current || !audioListenerRef.current) return;
-    const audioElements = [...mediaRef.current.getElementsByTagName('audio')];
-    if (audioElements.length) {
+    const audioContainer = document.getElementById('audio' + participant.sid);
+    const audioElements = audioContainer && [...audioContainer.getElementsByTagName('audio')];
+    if (audioElements && audioElements.length) {
       const listener = audioListenerRef.current;
       const group = groupRef.current;
       const sounds = audioElements.map(audio => {
@@ -65,13 +68,15 @@ export default function RemoteParticipant({
         group.add(sound);
         return sound;
       });
+      setAttachAudio(participant.sid, true);
       return () => {
         for (const sound of sounds) {
           group.remove(sound);
         }
+        setAttachAudio(participant.sid, false);
       };
     }
-  }, [camera, audioListenerRef, mediaRef]);
+  }, [participant, setAttachAudio, camera, audioListenerRef, mediaRef]);
 
   return (
     <group
