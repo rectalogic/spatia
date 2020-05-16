@@ -24,6 +24,7 @@ export default function RemoteParticipant({
   const [disableVideo, setDisableVideo] = useState(false);
   const { camera } = useThree();
   const groupRef = useRef<THREE.Object3D>(null!);
+  const soundMapRef = useRef(new Map<HTMLAudioElement, THREE.PositionalAudio>());
 
   useEffect(() => {
     function isObjectBehindCamera() {
@@ -61,10 +62,18 @@ export default function RemoteParticipant({
     if (audioElements && audioElements.length) {
       const listener = audioListenerRef.current;
       const group = groupRef.current;
+      const soundMap = soundMapRef.current;
       const sounds = audioElements.map(audio => {
-        const sound = new THREE.PositionalAudio(listener);
-        sound.setRefDistance(AUDIO_REF_DISTANCE);
-        sound.setMediaElementSource(audio);
+        let sound = soundMap.get(audio);
+        if (sound) {
+          sound.connect();
+        } else {
+          sound = new THREE.PositionalAudio(listener);
+          sound.setRefDistance(AUDIO_REF_DISTANCE);
+          sound.setMediaElementSource(audio);
+          sound.setDirectionalCone(360, 0, 0);
+          soundMap.set(audio, sound);
+        }
         group.add(sound);
         return sound;
       });
@@ -72,6 +81,7 @@ export default function RemoteParticipant({
       return () => {
         for (const sound of sounds) {
           group.remove(sound);
+          sound.disconnect();
         }
         setAttachAudio(participant.sid, false);
       };
