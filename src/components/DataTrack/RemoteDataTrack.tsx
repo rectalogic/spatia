@@ -1,6 +1,12 @@
 import { useEffect } from 'react';
-import { RemoteDataTrack as IRemoteDataTrack } from 'twilio-video';
-import { LocationChangeCallback, RequestLocationBroadcastCallback } from '../Participant/ParticipantLocation';
+import { RemoteDataTrack as IRemoteDataTrack, LocalDataTrack } from 'twilio-video';
+import {
+  LocationChangeCallback,
+  RequestLocationBroadcastCallback,
+  unmarshalLocation,
+  SendLocationTrigger,
+} from '../Participant/ParticipantLocation';
+import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 
 interface DataTrackProps {
   track: IRemoteDataTrack;
@@ -9,16 +15,23 @@ interface DataTrackProps {
 }
 
 export default function RemoteDataTrack({ track, onLocationChange, requestLocationBroadcast }: DataTrackProps) {
+  const { localTracks } = useVideoContext();
+  const localDataTrack = localTracks.find(track => track.kind === 'data') as LocalDataTrack;
+
+  useEffect(() => {
+    // On mount, trigger a resend of remote locations
+    localDataTrack.send(SendLocationTrigger);
+  }, [localDataTrack]);
+
   useEffect(() => {
     function handleMessage(buffer: ArrayBuffer) {
       const locationBuffer = new Float64Array(buffer);
       // Length 1 buffer is a special flag to trigger us to resend our location
-      if (locationBuffer.length === 1) {
+      if (locationBuffer.length === SendLocationTrigger.length) {
         requestLocationBroadcast && requestLocationBroadcast(track.sid);
         return;
       }
-      const location = { x: locationBuffer[0], z: locationBuffer[1], ry: locationBuffer[2] };
-      onLocationChange(location);
+      onLocationChange(unmarshalLocation(locationBuffer));
     }
     track.on('message', handleMessage);
     return () => {

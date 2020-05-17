@@ -11,7 +11,15 @@ import heightStone from './Textures/Ground/stone_height.png';
 import normalStone from './Textures/Ground/stone_normal.png';
 import roughnessStone from './Textures/Ground/stone_roughness.png';
 import SceneManagerBase from './SceneManagerBase';
-import { WORLD_SIZE, WORLD_SCALE, PORTALS, PORTAL_RADIUS, VIDEO_WIDTH } from '../Globals';
+import {
+  WORLD_RADIUS,
+  WORLD_SCALE,
+  PORTALS,
+  PORTAL_RADIUS,
+  VIDEO_WIDTH,
+  VIDEO_HEIGHT,
+  REMOTE_VIDEO_SCALE,
+} from '../Globals';
 
 export default class SceneManagerWebGL extends SceneManagerBase {
   constructor() {
@@ -21,7 +29,7 @@ export default class SceneManagerWebGL extends SceneManagerBase {
     this.scene.add(new THREE.AmbientLight(0xffad5e, 0.3));
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(0, WORLD_SCALE, -2 * WORLD_SCALE);
+    directionalLight.position.set(0, 3 * WORLD_SCALE, -2 * WORLD_SCALE);
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
     directionalLight.shadow.camera.near = 0.5 * WORLD_SCALE;
@@ -38,29 +46,30 @@ export default class SceneManagerWebGL extends SceneManagerBase {
       this.render();
     });
 
-    function loadTexture(loader: THREE.TextureLoader, url: string, render: () => void) {
+    const render = () => this.render();
+    function loadTexture(loader: THREE.TextureLoader, url: string) {
       const tex = loader.load(url, texture => render());
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(WORLD_SIZE / (6 * WORLD_SCALE), WORLD_SIZE / (6 * WORLD_SCALE));
+      tex.repeat.set(WORLD_RADIUS / (3 * WORLD_SCALE), WORLD_RADIUS / (3 * WORLD_SCALE));
       return tex;
     }
     const loader = new THREE.TextureLoader();
     const groundMaterialParams = {
       envMap: envMap,
-      roughnessMap: loadTexture(loader, roughnessStone, this.render),
-      displacementMap: loadTexture(loader, heightStone, this.render),
-      normalMap: loadTexture(loader, normalStone, this.render),
-      map: loadTexture(loader, albedoStone, this.render),
+      roughnessMap: loadTexture(loader, roughnessStone),
+      displacementMap: loadTexture(loader, heightStone),
+      normalMap: loadTexture(loader, normalStone),
+      map: loadTexture(loader, albedoStone),
     };
     const ground = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(WORLD_SIZE, WORLD_SIZE),
+      new THREE.CircleBufferGeometry(WORLD_RADIUS, 36),
       new THREE.MeshStandardMaterial(groundMaterialParams)
     );
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     this.scene.add(ground);
 
-    const portalMaterialParms = { envMap: envMap, metalness: 1, roughness: 0 };
+    const portalMaterialParms = { envMap: envMap, metalness: 0.3, roughness: 0 };
     for (const { position, color } of PORTALS) {
       const portal = new THREE.Mesh(
         new THREE.CylinderBufferGeometry(PORTAL_RADIUS, PORTAL_RADIUS, WORLD_SCALE / 16, 16),
@@ -73,11 +82,15 @@ export default class SceneManagerWebGL extends SceneManagerBase {
   }
 
   createRemoteParticipant() {
+    const group = new THREE.Group();
+    const depth = WORLD_SCALE / 2;
     const shadowCaster = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(2 * VIDEO_WIDTH, (2 * VIDEO_WIDTH * 9) / 16),
-      new THREE.MeshBasicMaterial({ opacity: 0 })
+      new THREE.BoxBufferGeometry(REMOTE_VIDEO_SCALE * VIDEO_WIDTH, REMOTE_VIDEO_SCALE * VIDEO_HEIGHT, depth),
+      new THREE.MeshBasicMaterial({ opacity: 0, transparent: true })
     );
+    shadowCaster.position.z = -depth / 2;
     shadowCaster.castShadow = true;
-    return shadowCaster;
+    group.add(shadowCaster);
+    return group;
   }
 }

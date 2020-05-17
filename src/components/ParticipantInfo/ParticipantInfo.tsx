@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       alignItems: 'center',
       width: `${theme.sidebarWidth}px`,
-      height: `${(theme.sidebarWidth * 9) / 16}px`,
+      height: `${theme.sidebarHeight}px`,
       overflow: 'hidden',
       cursor: 'pointer',
       '& video': {
@@ -32,8 +32,8 @@ const useStyles = makeStyles((theme: Theme) =>
         strokeWidth: '0.8px',
       },
       [theme.breakpoints.down('xs')]: {
-        height: theme.sidebarMobileHeight,
-        width: `${(theme.sidebarMobileHeight * 16) / 9}px`,
+        height: `${theme.sidebarMobileHeight}px`,
+        width: `${theme.sidebarWidth}px`,
         marginRight: '3px',
         fontSize: '10px',
       },

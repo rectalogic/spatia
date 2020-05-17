@@ -3,24 +3,19 @@ import * as THREE from 'three';
 import {
   LocalParticipant,
   RemoteParticipant,
-  Track,
-  LocalTrackPublication,
   RemoteVideoTrackPublication,
   RemoteAudioTrackPublication,
   RemoteDataTrackPublication,
+  LocalVideoTrackPublication,
 } from 'twilio-video';
 import {
-  LocalPublication,
   RemoteVideoPublication,
   RemoteAudioPublication,
   RemoteDataPublication,
+  LocalVideoPublication,
 } from '../Publication/Publication';
 import usePublications from '../../hooks/usePublications/usePublications';
-import {
-  LocationChangeCallback,
-  ParticipantLocation,
-  RequestLocationBroadcastCallback,
-} from '../Participant/ParticipantLocation';
+import { LocationChangeCallback, RequestLocationBroadcastCallback } from '../Participant/ParticipantLocation';
 import SceneManagerCSS3D from '../../three/SceneManagerCSS3D';
 
 /*
@@ -31,29 +26,18 @@ import SceneManagerCSS3D from '../../three/SceneManagerCSS3D';
  *  and the Publication component renders Tracks.
  */
 
-interface LocalParticipantTracksProps {
+interface LocalParticipantVideoTracksProps {
   participant: LocalParticipant;
-  location: ParticipantLocation;
-  triggerLocationBroadcast: Track.SID;
 }
-
-export function LocalParticipantTracks({
-  participant,
-  location,
-  triggerLocationBroadcast,
-}: LocalParticipantTracksProps) {
+export function LocalParticipantVideoTracks({ participant }: LocalParticipantVideoTracksProps) {
   const publications = usePublications(participant);
   return (
     <>
-      {publications.map(publication => (
-        <LocalPublication
-          key={publication.kind}
-          publication={publication as LocalTrackPublication}
-          participant={participant}
-          location={location}
-          triggerLocationBroadcast={triggerLocationBroadcast}
-        />
-      ))}
+      {publications.map(publication =>
+        publication.kind === 'video' ? (
+          <LocalVideoPublication key={publication.kind} publication={publication as LocalVideoTrackPublication} />
+        ) : null
+      )}
     </>
   );
 }

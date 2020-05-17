@@ -1,9 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import * as THREE from 'three';
 import { RemoteAudioTrack as IRemoteAudioTrack } from 'twilio-video';
-import { useAppState } from '../../state';
 import SceneManagerCSS3D from '../../three/SceneManagerCSS3D';
-import { AUDIO_REF_DISTANCE } from '../../Globals';
+import { WORLD_SCALE } from '../../Globals';
 
 interface RemoteAudioTrackProps {
   track: IRemoteAudioTrack;
@@ -12,29 +11,22 @@ interface RemoteAudioTrackProps {
 }
 
 export default function RemoteAudioTrack({ track, sceneManager, participant3D }: RemoteAudioTrackProps) {
-  const { activeSinkId } = useAppState();
-  const audioRef = useRef<HTMLAudioElement>(null!);
-
   useEffect(() => {
     if (participant3D) {
-      const audio = audioRef.current;
+      const mediaStream = new MediaStream([track.mediaStreamTrack.clone()]);
       const positionalAudio = new THREE.PositionalAudio(sceneManager.listener);
-      positionalAudio.setRefDistance(AUDIO_REF_DISTANCE);
+      // https://medium.com/@kfarr/understanding-web-audio-api-positional-audio-distance-models-for-webxr-e77998afcdff
+      positionalAudio.setRefDistance(3 * WORLD_SCALE);
+      positionalAudio.setRolloffFactor(3);
       positionalAudio.setDirectionalCone(360, 0, 0);
-      positionalAudio.setMediaElementSource(audio);
+      positionalAudio.setMediaStreamSource(mediaStream);
       participant3D.add(positionalAudio);
-      track.attach(audio);
       return () => {
-        track.detach(audio);
+        mediaStream.removeTrack(track.mediaStreamTrack);
         participant3D.remove(positionalAudio);
       };
     }
-  }, [audioRef, track, participant3D, sceneManager]);
+  }, [track, participant3D, sceneManager]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    audio.setSinkId?.(activeSinkId);
-  }, [audioRef, activeSinkId]);
-
-  return <audio ref={audioRef} />;
+  return null;
 }

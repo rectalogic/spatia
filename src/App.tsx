@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@material-ui/core/styles';
 
 import Controls from './components/Controls/Controls';
@@ -9,6 +9,7 @@ import Room from './components/Room/Room';
 
 import useHeight from './hooks/useHeight/useHeight';
 import useRoomState from './hooks/useRoomState/useRoomState';
+import PortalButtons from './components/PortalButtons/PortalButtons';
 
 const Container = styled('div')({
   display: 'grid',
@@ -29,11 +30,15 @@ export default function App() {
   // will look good on mobile browsers even after the location bar opens or closes.
   const height = useHeight();
 
+  const [center, setCenter] = useState<[number, number, number] | null>(null);
+
   return (
     <Container style={{ height }}>
-      <MenuBar />
+      <MenuBar>
+        <PortalButtons setCenter={setCenter} />
+      </MenuBar>
       <Main>
-        {roomState === 'disconnected' ? <LocalVideoPreview /> : <Room />}
+        {roomState === 'disconnected' ? <LocalVideoPreview /> : <Room portalCenter={center} />}
         <Controls />
       </Main>
       <ReconnectingNotification />

@@ -68,23 +68,6 @@ export default function ConnectionOptions({ className, hidden }: { className?: s
 
         <Grid item sm={6} xs={12}>
           <FormControl className={classes.formControl}>
-            <InputLabel id={inputLabels.dominantSpeakerPriority}>Dominant Speaker Priority:</InputLabel>
-            <Select
-              fullWidth
-              disabled={isDisabled}
-              name={inputLabels.dominantSpeakerPriority}
-              label={inputLabels.dominantSpeakerPriority}
-              value={withDefault(settings.dominantSpeakerPriority)}
-              onChange={handleChange}
-            >
-              <MenuItem value="low">Low</MenuItem>
-              <MenuItem value="standard">Standard</MenuItem>
-              <MenuItem value="high">High</MenuItem>
-              <MenuItem value="default">Server Default</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl className={classes.formControl}>
             <InputLabel id={inputLabels.trackSwitchOffMode}>Track Switch Off Mode:</InputLabel>
             <Select
               fullWidth

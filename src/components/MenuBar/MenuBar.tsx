@@ -31,6 +31,11 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       marginLeft: 'auto',
     },
+    centerContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      marginLeft: 'auto',
+    },
     form: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -58,7 +63,10 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export default function MenuBar() {
+interface MenuBarProps {
+  children: React.ReactChild;
+}
+export default function MenuBar({ children }: MenuBarProps) {
   const classes = useStyles();
   const { URLRoomName } = useParams();
   const { user, getToken, isFetching } = useAppState();
@@ -130,7 +138,10 @@ export default function MenuBar() {
             {(isConnecting || isFetching) && <CircularProgress className={classes.loadingSpinner} />}
           </form>
         ) : (
-          <h3>{roomName}</h3>
+          <>
+            <h3>{roomName}</h3>
+            <div className={classes.centerContainer}>{children}</div>
+          </>
         )}
         <div className={classes.rightButtonContainer}>
           <FlipCameraButton />

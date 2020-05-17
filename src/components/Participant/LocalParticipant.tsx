@@ -1,24 +1,16 @@
 import React from 'react';
-import { LocalParticipant as ILocalParticipant, Track } from 'twilio-video';
-import { LocalParticipantTracks } from '../ParticipantTracks/ParticipantTracks';
-import { ParticipantLocation } from './ParticipantLocation';
+import { LocalParticipant as ILocalParticipant } from 'twilio-video';
+import { LocalParticipantVideoTracks } from '../ParticipantTracks/ParticipantTracks';
+import ParticipantInfo from '../ParticipantInfo/ParticipantInfo';
 
 export interface LocalParticipantProps {
   participant: ILocalParticipant;
-  participantLocation: ParticipantLocation;
-  triggerLocationBroadcast: Track.SID;
 }
 
-export default function LocalParticipant({
-  participant,
-  participantLocation,
-  triggerLocationBroadcast,
-}: LocalParticipantProps) {
+export default function LocalParticipant({ participant }: LocalParticipantProps) {
   return (
-    <LocalParticipantTracks
-      participant={participant}
-      location={participantLocation}
-      triggerLocationBroadcast={triggerLocationBroadcast}
-    />
+    <ParticipantInfo participant={participant}>
+      <LocalParticipantVideoTracks participant={participant} />
+    </ParticipantInfo>
   );
 }

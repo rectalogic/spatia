@@ -3,56 +3,27 @@ import * as THREE from 'three';
 import useTrack from '../../hooks/useTrack/useTrack';
 import RemoteAudioTrack from '../AudioTrack/AudioTrack';
 import VideoTrack from '../VideoTrack/VideoTrack';
-import LocalDataTrack from '../DataTrack/LocalDataTrack';
 import RemoteDataTrack from '../DataTrack/RemoteDataTrack';
-import {
-  ParticipantLocation,
-  LocationChangeCallback,
-  RequestLocationBroadcastCallback,
-} from '../Participant/ParticipantLocation';
+import { LocationChangeCallback, RequestLocationBroadcastCallback } from '../Participant/ParticipantLocation';
 
 import { IVideoTrack } from '../../types';
 import {
   RemoteAudioTrack as IRemoteAudioTrack,
-  LocalDataTrack as ILocalDataTrack,
   RemoteDataTrack as IRemoteDataTrack,
-  LocalTrackPublication,
-  Track,
-  LocalParticipant,
   RemoteVideoTrackPublication,
   RemoteAudioTrackPublication,
   RemoteDataTrackPublication,
+  LocalVideoTrackPublication,
 } from 'twilio-video';
 import SceneManagerCSS3D from '../../three/SceneManagerCSS3D';
 
-interface LocalPublicationProps {
-  publication: LocalTrackPublication;
-  participant: LocalParticipant;
-  location: ParticipantLocation;
-  triggerLocationBroadcast: Track.SID;
+interface LocalVideoPublicationProps {
+  publication: LocalVideoTrackPublication;
 }
-
-export function LocalPublication({ publication, location, triggerLocationBroadcast }: LocalPublicationProps) {
+export function LocalVideoPublication({ publication }: LocalVideoPublicationProps) {
   const track = useTrack(publication);
-
   if (!track) return null;
-
-  switch (track.kind) {
-    case 'video':
-      return <VideoTrack track={track as IVideoTrack} isLocal priority="standard" />;
-    case 'audio':
-      return null;
-    case 'data':
-      return (
-        <LocalDataTrack
-          track={track as ILocalDataTrack}
-          location={location}
-          triggerLocationBroadcast={triggerLocationBroadcast}
-        />
-      );
-    default:
-      return null;
-  }
+  return <VideoTrack track={track as IVideoTrack} isLocal priority="standard" />;
 }
 
 interface RemoteVideoPublicationProps {

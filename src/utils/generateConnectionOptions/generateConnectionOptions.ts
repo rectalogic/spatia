@@ -23,7 +23,7 @@ export default function generateConnectionOptions(settings: Settings) {
         maxTracks: Number(settings.maxTracks),
       },
     },
-    dominantSpeaker: true,
+    dominantSpeaker: false,
     networkQuality: { local: 1, remote: 1 },
 
     // Comment this line if you are playing music.
