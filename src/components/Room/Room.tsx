@@ -142,7 +142,13 @@ export default function Room({ portalCenter }: RoomProps) {
         >
           <circle onClick={onMapClick} cx="0" cy="0" r={WORLD_RADIUS} fill="black" opacity="0.5" />
           {PORTALS.map(portal => (
-            <circle cx={portal.position[0]} cy={portal.position[2]} r={WORLD_SCALE * 5} fill={portal.color} />
+            <circle
+              key={portal.color.toString()}
+              cx={portal.position[0]}
+              cy={portal.position[2]}
+              r={WORLD_SCALE * 5}
+              fill={portal.color}
+            />
           ))}
           <MapLocation participant={localParticipant} location={localParticipantLocation} color="white" />
           {participants.map(participant => (
