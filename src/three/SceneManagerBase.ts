@@ -27,7 +27,7 @@ export default abstract class SceneManagerBase {
   constructor(renderer: Renderer) {
     this.renderer = renderer;
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(CAMERA_FOV, undefined, 0.1 * WORLD_SCALE, WORLD_RADIUS);
+    this.camera = new THREE.PerspectiveCamera(CAMERA_FOV, undefined, 0.1 * WORLD_SCALE, 2 * WORLD_RADIUS);
     this.camera.rotation.y = Math.PI;
     this.camera.rotation.x = THREE.MathUtils.degToRad(10);
     this.camera.position.y = WORLD_SCALE;

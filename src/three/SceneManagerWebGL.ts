@@ -79,6 +79,15 @@ export default class SceneManagerWebGL extends SceneManagerBase {
       portal.position.fromArray(position);
       this.scene.add(portal);
     }
+
+    const walls = new THREE.Mesh(
+      new THREE.CylinderBufferGeometry(WORLD_RADIUS, WORLD_RADIUS, WORLD_SCALE, WORLD_SCALE / 16, 1, true),
+      new THREE.MeshStandardMaterial({ side: THREE.BackSide, color: 'red' })
+    );
+    walls.position.y = WORLD_SCALE / 2;
+    walls.receiveShadow = true;
+    walls.castShadow = true;
+    this.scene.add(walls);
   }
 
   createRemoteParticipant() {
