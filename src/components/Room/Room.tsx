@@ -16,7 +16,7 @@ import SceneManager from '../../three/SceneManager';
 import { styled } from '@material-ui/core/styles';
 import useController from '../../hooks/useController/useController';
 import useKeyPress from '../../hooks/useController/useKeyPress';
-import MapLocation from '../Participant/MapLocation';
+import MapLocation, { MAP_SCALE } from '../Participant/MapLocation';
 import { useThrottle } from '../../hooks/useThrottle/useThrottle';
 
 const Controller = styled('div')(({ theme }) => ({
@@ -146,7 +146,7 @@ export default function Room({ portalCenter }: RoomProps) {
               key={portal.color.toString()}
               cx={portal.position[0]}
               cy={portal.position[2]}
-              r={WORLD_SCALE * 5}
+              r={WORLD_SCALE * MAP_SCALE}
               fill={portal.color}
             />
           ))}

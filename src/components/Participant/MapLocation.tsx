@@ -4,9 +4,10 @@ import { Participant } from 'twilio-video';
 import { ParticipantLocation } from './ParticipantLocation';
 import { WORLD_SCALE } from '../../Globals';
 
-const HALF_SIZE = WORLD_SCALE * 5;
+export const MAP_SCALE = 3;
+const HALF_SIZE = WORLD_SCALE * MAP_SCALE;
 const SIZE = HALF_SIZE * 2;
-const STROKE_WIDTH = HALF_SIZE / 5;
+const STROKE_WIDTH = HALF_SIZE / MAP_SCALE;
 
 interface MapLocationProps {
   participant: Participant;

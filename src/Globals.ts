@@ -3,7 +3,7 @@ export const VIDEO_WIDTH = WORLD_SCALE;
 export const VIDEO_HEIGHT = VIDEO_WIDTH * (9 / 16);
 export const REMOTE_VIDEO_SCALE = 2;
 export const CAMERA_FOV = 60;
-export const WORLD_RADIUS = 64 * WORLD_SCALE;
+export const WORLD_RADIUS = 32 * WORLD_SCALE;
 export const PORTAL_RADIUS = WORLD_SCALE;
 
 interface PortalProps {
