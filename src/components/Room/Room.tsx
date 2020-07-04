@@ -11,13 +11,14 @@ import {
   marshalLocation,
   rotationToPortalAngle,
 } from '../Participant/ParticipantLocation';
-import { PORTALS, WORLD_RADIUS, WORLD_SCALE, VIDEO_HEIGHT } from '../../Globals';
+import { PORTALS, WORLD_RADIUS, WORLD_SCALE } from '../../Globals';
 import SceneManager from '../../three/SceneManager';
 import { styled } from '@material-ui/core/styles';
 import useController from '../../hooks/useController/useController';
 import useKeyPress from '../../hooks/useController/useKeyPress';
-import MapLocation, { MAP_SCALE } from '../Participant/MapLocation';
+import MapLocation from '../WorldMap/MapLocation';
 import { useThrottle } from '../../hooks/useThrottle/useThrottle';
+import WorldMap from '../WorldMap/WorldMap';
 
 const Controller = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -134,22 +135,7 @@ export default function Room({ portalCenter }: RoomProps) {
       <CanvasCSS3D ref={canvasCSS3DRef} />
 
       <div style={{ position: 'absolute', top: '0', right: '0', zIndex: 1 }}>
-        <svg
-          width={VIDEO_HEIGHT + 'px'}
-          height={VIDEO_HEIGHT + 'px'}
-          viewBox={`${-WORLD_RADIUS} ${-WORLD_RADIUS} ${2 * WORLD_RADIUS} ${2 * WORLD_RADIUS}`}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle onClick={onMapClick} cx="0" cy="0" r={WORLD_RADIUS} fill="black" opacity="0.5" />
-          {PORTALS.map(portal => (
-            <circle
-              key={portal.color.toString()}
-              cx={portal.position[0]}
-              cy={portal.position[2]}
-              r={WORLD_SCALE * MAP_SCALE}
-              fill={portal.color}
-            />
-          ))}
+        <WorldMap onClick={onMapClick}>
           <MapLocation participant={localParticipant} location={localParticipantLocation} color="white" />
           {participants.map(participant => (
             <RemoteParticipant
@@ -159,7 +145,7 @@ export default function Room({ portalCenter }: RoomProps) {
               requestLocationBroadcast={setCurrentLocationBroadcastRequested}
             />
           ))}
-        </svg>
+        </WorldMap>
       </div>
 
       <div style={{ position: 'absolute', width: '100%', top: '0', textAlign: 'center' }}>

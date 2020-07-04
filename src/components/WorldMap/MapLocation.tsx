@@ -1,10 +1,10 @@
 import React from 'react';
 import * as THREE from 'three';
 import { Participant } from 'twilio-video';
-import { ParticipantLocation } from './ParticipantLocation';
+import { ParticipantLocation } from '../Participant/ParticipantLocation';
 import { WORLD_SCALE } from '../../Globals';
+import { MAP_SCALE } from './WorldMap';
 
-export const MAP_SCALE = 3;
 const HALF_SIZE = WORLD_SCALE * MAP_SCALE;
 const SIZE = HALF_SIZE * 2;
 const STROKE_WIDTH = HALF_SIZE / MAP_SCALE;

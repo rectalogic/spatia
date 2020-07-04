@@ -5,7 +5,7 @@ import RemoteParticipantWebGL from './RemoteParticipantWebGL';
 import SceneManager from '../../three/SceneManager';
 import { RemoteParticipantDataTracks } from '../ParticipantTracks/ParticipantTracks';
 import RemoteParticipantCSS3D from './RemoteParticipantCSS3D';
-import MapLocation from './MapLocation';
+import MapLocation from '../WorldMap/MapLocation';
 import randomColor from 'randomcolor';
 
 interface RemoteParticipantProps {
