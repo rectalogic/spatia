@@ -83,8 +83,8 @@ export default function Room({ portalCenter }: RoomProps) {
       }
       object.translateZ(acceleration.y * (WORLD_SCALE / 10));
       // Don't allow walking off the world
-      if (object.position.length() > WORLD_RADIUS) {
-        object.position.setLength(WORLD_RADIUS);
+      if (object.position.length() > WORLD_RADIUS - WORLD_SCALE) {
+        object.position.setLength(WORLD_RADIUS - WORLD_SCALE);
       }
     } else {
       const angle = rotationToPortalAngle(object.rotation.y) + -acceleration.x / 100;
