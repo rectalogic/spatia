@@ -36,14 +36,14 @@ export default class SceneManagerWebGL extends SceneManagerBase {
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(0, 20 * WORLD_SCALE, -20 * WORLD_SCALE);
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
     directionalLight.shadow.camera.near = 15 * WORLD_SCALE;
     directionalLight.shadow.camera.far = 50 * WORLD_SCALE;
-    directionalLight.shadow.camera.left = -(WORLD_RADIUS + 6 * WORLD_SCALE);
-    directionalLight.shadow.camera.right = WORLD_RADIUS + 6 * WORLD_SCALE;
-    directionalLight.shadow.camera.top = WORLD_RADIUS;
-    directionalLight.shadow.camera.bottom = -WORLD_RADIUS / 1.3;
+    directionalLight.shadow.camera.left = -(WORLD_RADIUS + 20 * WORLD_SCALE);
+    directionalLight.shadow.camera.right = WORLD_RADIUS + 20 * WORLD_SCALE;
+    directionalLight.shadow.camera.top = WORLD_RADIUS + 20 * WORLD_SCALE;
+    directionalLight.shadow.camera.bottom = -(WORLD_RADIUS + 20 * WORLD_SCALE);
     directionalLight.castShadow = true;
     this.scene.add(directionalLight);
 
