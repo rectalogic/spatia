@@ -12,17 +12,17 @@
     "@types/fscreen": "^1.0.1",
     "@types/jest": "^24.9.1",
     "@types/lodash.throttle": "^4.1.6",
-    "@types/node": "^12.12.47",
+    "@types/node": "^12.12.51",
     "@types/randomcolor": "^0.5.5",
-    "@types/react": "^16.9.41",
+    "@types/react": "^16.9.43",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.5",
-    "@types/twilio-video": "^2.0.12",
+    "@types/twilio-video": "^2.7.0",
     "concurrently": "^5.2.0",
     "cross-env": "^7.0.2",
     "d3-timer": "^1.0.10",
     "express": "^4.17.1",
-    "firebase": "^7.15.5",
+    "firebase": "^7.16.1",
     "fscreen": "^1.0.2",
     "husky": "^3.1.0",
     "lint-staged": "^9.5.0",
@@ -35,9 +35,9 @@
     "react-scripts": "^3.4.1",
     "strip-color": "^0.1.0",
     "three": "^0.115.0",
-    "twilio": "^3.47.0",
+    "twilio": "^3.48.0",
     "twilio-video": "^2.7.0",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.7"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -58,7 +58,7 @@
     "pixelmatch": "^5.2.1",
     "puppeteer": "^2.1.1",
     "react-test-renderer": "^16.13.1",
-    "start-server-and-test": "^1.11.0",
+    "start-server-and-test": "^1.11.2",
     "ts-jest": "^24.3.0"
   },
   "lint-staged": {
