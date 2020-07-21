@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { RemoteAudioTrack as IRemoteAudioTrack } from 'twilio-video';
 import SceneManagerCSS3D from '../../three/SceneManagerCSS3D';
 import { WORLD_SCALE } from '../../Globals';
+import useMediaStreamTrack from '../../hooks/useMediaStreamTrack/useMediaStreamTrack';
 
 interface RemoteAudioTrackProps {
   track: IRemoteAudioTrack;
@@ -11,9 +12,11 @@ interface RemoteAudioTrackProps {
 }
 
 export default function RemoteAudioTrack({ track, sceneManager, participant3D }: RemoteAudioTrackProps) {
+  const mediaStreamTrack = useMediaStreamTrack(track);
+
   useEffect(() => {
-    if (participant3D) {
-      const mediaStream = new MediaStream([track.mediaStreamTrack.clone()]);
+    if (mediaStreamTrack && participant3D) {
+      const mediaStream = new MediaStream([mediaStreamTrack.clone()]);
       const positionalAudio = new THREE.PositionalAudio(sceneManager.listener);
       // https://medium.com/@kfarr/understanding-web-audio-api-positional-audio-distance-models-for-webxr-e77998afcdff
       positionalAudio.setRefDistance(3 * WORLD_SCALE);
@@ -22,11 +25,11 @@ export default function RemoteAudioTrack({ track, sceneManager, participant3D }:
       positionalAudio.setMediaStreamSource(mediaStream);
       participant3D.add(positionalAudio);
       return () => {
-        mediaStream.removeTrack(track.mediaStreamTrack);
+        mediaStream.removeTrack(mediaStreamTrack);
         participant3D.remove(positionalAudio);
       };
     }
-  }, [track, participant3D, sceneManager]);
+  }, [mediaStreamTrack, participant3D, sceneManager]);
 
   return null;
 }
