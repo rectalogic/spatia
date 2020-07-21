@@ -1,8 +1,8 @@
 # Spatia - 3D Video Chat
 
-Spatia is a fork of the [twilio sample](https://github.com/twilio/twilio-video-app-react) video chat application that renders participants video into a 3D world with spatial audio.
+Spatia is a fork of the [twilio sample](https://github.com/twilio/twilio-video-app-react) video chat application that renders participants video into a 3D world with positional audio.
 It is designed for cocktail party/house party style meetings where groups of participants can naturally
-congregate together in small groups. Audio is be audible to nearby participants, and less audible to participants further away.
+congregate together in small groups. Audio is audible to nearby participants, and less audible to participants further away.
 
 ![Spatia screenshot](images/screenshot.png)
 
@@ -12,6 +12,7 @@ You can deploy the app using Twilio serverless, it requires a free Twilio accoun
 
 Login to any room name, all participants using the same room name will be visible to each other.
 Use keyboard (arrow keys or WASD) to navigate, or hold mouse on screen.
+Hold `Shift` to move left/right instead of rotating.
 Clicking one of the colored locks at the top will warp to the corresponding table and navigation will change to rotate around the table. Click the unlock icon to switch back to free navigation.
 
 The map shows the location of other participants, clicking the map will also warp to that location.
